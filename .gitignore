@@ -2,3 +2,5 @@ examples/*
 data/*
 .c9/*
 emrun.py
+makefile
+documentation
