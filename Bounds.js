@@ -2,17 +2,22 @@
 export function constrainReticle(reticle, player, radius) {
     var distX = reticle.x-player.x; // X distance between player & reticle
     var distY = reticle.y-player.y; // Y distance between player & reticle
-
+    // fix this
+    const SCALE = 1.6;
+    const WIDTH = 1280*SCALE/2;
+    const HEIGHT = 720*SCALE/2;
+    
     // Ensures reticle cannot be moved offscreen
-    if (distX > 800)
-        reticle.x = player.x+800;
-    else if (distX < -800)
-        reticle.x = player.x-800;
+    // game.physics.getBottomRight();
+    if (distX > WIDTH)
+        reticle.x = player.x+WIDTH;
+    else if (distX < -WIDTH)
+        reticle.x = player.x-WIDTH;
 
-    if (distY > 600)
-        reticle.y = player.y+600;
-    else if (distY < -600)
-        reticle.y = player.y-600;
+    if (distY > HEIGHT)
+        reticle.y = player.y+HEIGHT;
+    else if (distY < -HEIGHT)
+        reticle.y = player.y-HEIGHT;
 
     // Ensures reticle cannot be moved further than dist(radius) from player
     var distBetween = Phaser.Math.Distance.Between(player.x, player.y, reticle.x, reticle.y);
@@ -48,4 +53,15 @@ export function CircleInRectY(circle, rect) {
 		return false;
 	}
 	return true;
+}
+
+export function TossCoin(prob) {
+	return (Math.random() < prob);
+}
+export function getRandom(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+export function GetRandomVec2(xMin, xMax, yMin, yMax) {
+	return { x: getRandom(xMin, xMax), y: getRandom(yMin, yMax) };
 }
