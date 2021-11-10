@@ -1,4 +1,4 @@
-// Ensures reticle does not move offscreen and dist(radius) from player
+// Ensures reticle does not move offscreen and dist(radius) from player. 
 export function constrainReticle(reticle, player, radius) {
     var distX = reticle.x-player.x; // X distance between player & reticle
     var distY = reticle.y-player.y; // Y distance between player & reticle

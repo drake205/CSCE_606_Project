@@ -5,15 +5,12 @@ export class Enemy extends Phaser.GameObjects.Sprite {
     glow;
     
     constructor(scene, x, y, texture) {
-        
         super(scene, x, y, texture);
-        
         scene.physics.world.enable(this);
         this.body.setCollideWorldBounds(true);
         scene.add.existing(this);
         this.setScale(0.25);
         this.angle = 0;
-        // this.max_velocity = 10;
     }
     
     setTarget(target)

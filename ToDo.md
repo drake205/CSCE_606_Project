@@ -3,6 +3,21 @@
 - Change cursor to crosshair instead.
 - add weapons and bullet manager/projectile class.
 - better ai.
+- damage/death/respawn
+- better way to handle wall keyup velocity. (i had this done but by integrating into phaser it made it worse.)
+- - fixed but now issue when a+d or w+s is back
+- figure out is preUpdate should only be used for specific things or what.
+- perhaps add seperate event handling for each input event
+- remove max_velocity & replace with phasers equivelent.
+- better rotation of arms. use a texture maybe
+- animation of arms for diff poses such as punch, weapon in hard etc.
+- add player collider with item.
+- move light to center of player from top left
+- move bullet to tip of gun from top left
+- normalize bullet dir
+- bullet speed currently based on distance from player. fix by normalizing i think.
+- bullet destruction
+- Constrain reticle to screen or stop locking reticle in screen
 
 ================================================================================
 # Bugs
@@ -20,3 +35,9 @@
 - Bug: Screen goes dark if pointer outside world bounds. issue with lighting im pretty sure.
 -- moved light to player position
 - Make camera not exit world bounds
+ 
+
+================================================================================
+# Ideas
+================================================================================
+- Glow on enemy sprite radius becomes something like sprite.glow.radius = (cos(time or frame)+1)*sprite.radius;

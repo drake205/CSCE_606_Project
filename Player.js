@@ -1,11 +1,9 @@
-import { CircleInRectX, CircleInRectY } from './Bounds.js'
-import { constrainReticle } from './Bounds.js';
+import { BulletMan } from './BulletMan.js';
 
-
+// WEAPON ENUM
 const Weapons = Object.freeze({
     GUN:   Symbol("weapon")
 });
-
 
 
 export class Player extends Phaser.GameObjects.Sprite
@@ -18,7 +16,6 @@ export class Player extends Phaser.GameObjects.Sprite
     #weapon; #ammo
     shoot;
 
-    // move to create?
     constructor(scene, x, y, r) {
         let circ = scene.make.graphics()
             .fillStyle(0x6666ff)
@@ -44,10 +41,12 @@ export class Player extends Phaser.GameObjects.Sprite
         this.body.setMaxVelocity(300, 300);
         this.max_velocity = 300;
         this.shoot = false;
-
+        this.weapon = Weapons.GUN;
+        
         document.addEventListener("keydown", this);
         document.addEventListener("keyup", this);
         document.addEventListener("mousedown", this);
+        document.addEventListener("mouseup", this);
     }
 
     
@@ -57,7 +56,6 @@ export class Player extends Phaser.GameObjects.Sprite
             this.body.x, this.body.y, 
             Player.reticle.x, Player.reticle.y
         );
-        
     }
 
     
@@ -66,13 +64,25 @@ export class Player extends Phaser.GameObjects.Sprite
         if(this.shoot) {
             switch(this.weapon) {
                 case Weapons.GUN:
+                    
                     // make sound
                     // spawn x bullet
                     // spawn muzzle flash
-                    
+                    // let traj = {x: Math.cos(this.angle)*50, y: Math.sin(this.angle)*50};
+                    // let traj = {x: , y: Math.sin(this.angle)*-2000};
+                    // console.log(Player.body.x);
+                    // + 0.5*width
+                    var loc = {x: Player.body.x,  y: Player.body.y};
+                    var dir = {x: Player.reticle.body.x-Player.body.x,  y: Player.reticle.body.y-Player.body.y};
+                    // console.log(Player.reticle.position);
+                    BulletMan.addBullet("syringe", loc, dir);
+                    // BulletMan.addBullet("syringe", this.body.position, Player.reticle.position);
+                    this.shoot = false;
                 default:
             }
+            
         }
+        
         
         Phaser.Math.RotateTo(this.a1, this.body.x+this.r, this.body.y+this.r, this.angle-0.7854, this.r);
         Phaser.Math.RotateTo(this.a2, this.body.x+this.r, this.body.y+this.r, this.angle+0.7854, this.r);
@@ -81,6 +91,7 @@ export class Player extends Phaser.GameObjects.Sprite
     
     
     handleEvent(e) {
+
         e.preventDefault(); // no other capture this
         if(e.type == 'keydown' && this.pressedKeys[e.keyCode] != true) {
             this.pressedKeys[e.keyCode] = true;
@@ -97,15 +108,29 @@ export class Player extends Phaser.GameObjects.Sprite
         }
         else if(e.type == 'keyup') {
             this.pressedKeys[e.keyCode] = false;
+            // figure out that if touching wall ignore next keyup?
+            // if velocity is 0/is touching wall then ignore
             switch(e.keyCode) {
                 case 65:    // left
-                case 37:    this.body.velocity.x += this.max_velocity; break;
+                case 37:    
+                        if(this.body.velocity.x != 0) 
+                            this.body.velocity.x += this.max_velocity; 
+                            break;
                 case 87:    // up
-                case 38:    this.body.velocity.y += this.max_velocity; break;
+                case 38:    
+                    if(this.body.velocity.y != 0) 
+                        this.body.velocity.y += this.max_velocity; 
+                        break;
                 case 68:    // right
-                case 39:    this.body.velocity.x -= this.max_velocity; break;
+                case 39:    
+                    if(this.body.velocity.x != 0) 
+                        this.body.velocity.x -= this.max_velocity; 
+                    break;
                 case 83:    // down
-                case 40:    this.body.velocity.y -= this.max_velocity; break;
+                case 40:    
+                    if(this.body.velocity.y != 0) 
+                        this.body.velocity.y -= this.max_velocity; 
+                    break;
             };
         }
         else if(e.type == 'mousedown') {
@@ -128,12 +153,14 @@ export class Player extends Phaser.GameObjects.Sprite
     
 };
 
-//{ another way to rotate around center
-// orb = game.add.sprite(400, 300, 'ball');
-// orb.anchor.setTo(0.5);
-// orb.pivot.x = 100;
-// body.rotation = 
-// https://phaser.io/examples/v2/sprites/rotate-sprite-around-point}
+//{
+    //another way to rotate around center. this may be better
+    // orb = game.add.sprite(400, 300, 'ball');
+    // orb.anchor.setTo(0.5);
+    // orb.pivot.x = 100;
+    // body.rotation = 
+    // https://phaser.io/examples/v2/sprites/rotate-sprite-around-point
+// }
 Phaser.GameObjects.GameObjectFactory.register('player', function (x, y, r) {
 	const pl1 = new Player(this.scene, x, y, r);
     this.displayList.add(pl1);

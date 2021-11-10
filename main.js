@@ -1,5 +1,5 @@
-// import Phaser from './site/phaser.js'
 import { Player } from './Player.js';
+import { BulletMan } from "./BulletMan.js"
 import { EntityMan } from "./EntityMan.js"
 
 
@@ -7,8 +7,6 @@ const SCALE = 1.6;
 const WIDTH = 1280*SCALE;
 const HEIGHT = 720*SCALE;
 
-
-//==============================================================================
 
 class Game extends Phaser.Scene {
     
@@ -26,6 +24,10 @@ class Game extends Phaser.Scene {
     
     preload() {
         // load content
+        this.load.image({
+            key: 'syringe', 
+            url: 'data/pics/syringe.png'
+        });
         this.load.image({
             key: 'reticle', 
             url: 'data/pics/reticle2.png'
@@ -47,7 +49,6 @@ class Game extends Phaser.Scene {
     }
     
     create(data) {
-        /*---------------------- World Setup ---------------------------------*/
         this.physics.world.setBounds(0, 0, WIDTH, HEIGHT);                                     // Create world bounds
         this.cameras.main.zoom = 0.7;
         this.cameras.main.setBounds(0, 0, WIDTH, HEIGHT);
@@ -58,6 +59,7 @@ class Game extends Phaser.Scene {
             .setOrigin(0.5, 0.5)
             .setDisplaySize(WIDTH, HEIGHT);
         EntityMan.Init(this);
+        BulletMan.Init(this);
         Game.light  = this.lights.addLight(0, 0, 200);
         this.lights.enable().setAmbientColor(0x555555);
 
@@ -66,8 +68,6 @@ class Game extends Phaser.Scene {
         });
         this.input.on('pointermove', function(pointer) {                                   // Move reticle upon locked pointer move
             if(this.input.mouse.locked) {
-                // Player.reticle.x = pointer.x;
-                // Player.reticle.y = pointer.y;
                 Player.reticle.x += pointer.movementX;
                 Player.reticle.y += pointer.movementY;
             }
@@ -77,9 +77,9 @@ class Game extends Phaser.Scene {
     update(time, delta) {
         this.cameras.main.startFollow(EntityMan.player);
         EntityMan.Update(time, delta);
+        BulletMan.Update(time, delta);
         Game.light.setPosition(Player.body.x, Player.body.y);     // make light follow bound reticle
         // this.cameras.main.startFollow(Player.reticle);
-        
     }
 }
 

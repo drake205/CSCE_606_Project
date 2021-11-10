@@ -3,18 +3,18 @@ import { Enemy } from "./Enemies.js"
 export class EntityMan {
     
     static player;
-    static enemies; //= [];
-    scene;
+    static enemies;
+    static scene;
 
     
     static Init(scene) {
-        this.scene = scene;
+        EntityMan.scene = scene;
         EntityMan.player = scene.add.player(700, 600, 40);
         EntityMan.enemies = scene.add.group({
 			classType: Enemy,
 			runChildUpdate: true
 		});
-		for(let i = 0; i < 5; ++i) {
+		for(let i = 0; i < 5; ++i) { // will be removed later
 		    let spawnloc = Enemy.SpawnLoc(scene);
 		    EntityMan.enemies.get(spawnloc.x, spawnloc.y, 'covid2');
 		}
@@ -26,6 +26,7 @@ export class EntityMan {
         	light.color.set(1, 0.2, 0.2);
         	child.glow = light;
         });
+        // dont need to refresh i think
     }
     
     static Update(time, delta) {
@@ -33,7 +34,8 @@ export class EntityMan {
     }
     
     static SpawnEnemy() {
-        
+        let spawnloc = Enemy.SpawnLoc(EntityMan.scene); // maybe just pass scene in
+	    EntityMan.enemies.get(spawnloc.x, spawnloc.y, 'covid2');
     }
 
 
