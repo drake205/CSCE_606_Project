@@ -1,4 +1,5 @@
 import { BulletMan } from './BulletMan.js';
+import { normalize } from './Bounds.js';
 
 // WEAPON ENUM
 const Weapons = Object.freeze({
@@ -52,40 +53,37 @@ export class Player extends Phaser.GameObjects.Sprite
     
     preUpdate(time, deltaTime) {
         super.preUpdate(time, deltaTime);
-        this.angle = Phaser.Math.Angle.Between(
-            this.body.x, this.body.y, 
-            Player.reticle.x, Player.reticle.y
-        );
     }
 
     
     // To do: add colliders or something
     update(time, deltaTime) {
+        let pc = this.getCenter();
+        let rc = Player.reticle.getCenter();
+        this.angle = Phaser.Math.Angle.Between(
+            pc.x, pc.y, 
+            rc.x, rc.y
+        );
+        
         if(this.shoot) {
             switch(this.weapon) {
                 case Weapons.GUN:
-                    
                     // make sound
                     // spawn x bullet
                     // spawn muzzle flash
-                    // let traj = {x: Math.cos(this.angle)*50, y: Math.sin(this.angle)*50};
-                    // let traj = {x: , y: Math.sin(this.angle)*-2000};
-                    // console.log(Player.body.x);
-                    // + 0.5*width
-                    var loc = {x: Player.body.x,  y: Player.body.y};
-                    var dir = {x: Player.reticle.body.x-Player.body.x,  y: Player.reticle.body.y-Player.body.y};
-                    // console.log(Player.reticle.position);
-                    BulletMan.addBullet("syringe", loc, dir);
-                    // BulletMan.addBullet("syringe", this.body.position, Player.reticle.position);
-                    this.shoot = false;
+                    var dir = normalize({
+                        x: rc.x-pc.x,  
+                        y: rc.y-pc.y
+                    });
+                    BulletMan.addBullet("syringe", pc, dir);
+                    this.shoot = false; // 1 bullet per click
                 default:
             }
             
         }
-        
-        
-        Phaser.Math.RotateTo(this.a1, this.body.x+this.r, this.body.y+this.r, this.angle-0.7854, this.r);
-        Phaser.Math.RotateTo(this.a2, this.body.x+this.r, this.body.y+this.r, this.angle+0.7854, this.r);
+        // console.log(this.scene.input.keyboard.checkDown(Phaser.Input.Keyboard.KeyCodes.W));
+        Phaser.Math.RotateTo(this.a1, pc.x, pc.y, this.angle-0.7854, this.r);
+        Phaser.Math.RotateTo(this.a2, pc.x, pc.y, this.angle+0.7854, this.r);
         Player.reticle.setVelocity(this.body.velocity.x, this.body.velocity.y);
     }
     
@@ -150,6 +148,7 @@ export class Player extends Phaser.GameObjects.Sprite
             this.ammo = ammo;
         }
     }
+    
     
 };
 

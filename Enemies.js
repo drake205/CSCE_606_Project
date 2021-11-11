@@ -18,22 +18,17 @@ export class Enemy extends Phaser.GameObjects.Sprite {
 		this.target = target; // if target alive?
 	}
     
-    update() {
-        // this.body.rotate += 0.05;
-        this.angle += 1;
+    update(t, dt) {
+        const c = this.getCenter();
         if (this.target)
 		{
-            const tx = this.target.x;
-            const ty = this.target.y;
-            const x = this.body.x;
-            const y = this.body.y;
-            
-            const rotation = Phaser.Math.Angle.Between(x, y, tx, ty);
+            const tc = this.target.getCenter();
+            const rotation = Phaser.Math.Angle.Between(c.x, c.y, tc.x, tc.y);
             this.setRotation(rotation);
             //  game.physics.arcade.velocityFromRotation(rotation, 150, this.body.velocity);
 		}
 		this.scene.physics.velocityFromRotation(this.rotation, 150, this.body.velocity);
-		this.glow.setPosition(this.body.x+this.body.width/2, this.body.y+this.body.height/2); // better way to do this or get coords
+		this.glow.setPosition(c.x, c.y);
     }
     
     
@@ -71,7 +66,6 @@ export class Enemy extends Phaser.GameObjects.Sprite {
     	}
     	return r;
     }
-    
     
     
 };

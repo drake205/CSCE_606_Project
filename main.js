@@ -78,7 +78,8 @@ class Game extends Phaser.Scene {
         this.cameras.main.startFollow(EntityMan.player);
         EntityMan.Update(time, delta);
         BulletMan.Update(time, delta);
-        Game.light.setPosition(Player.body.x, Player.body.y);     // make light follow bound reticle
+        let pc = EntityMan.player.getCenter();
+        Game.light.setPosition(pc.x, pc.y);     // make light follow bound reticle
         // this.cameras.main.startFollow(Player.reticle);
     }
 }
