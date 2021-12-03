@@ -7,6 +7,7 @@
 
 
 ## To Do: Misc
+- Change virus shaders to a spritesheet. Running them as a shader is kinda dumb
 - add weapons
     - show weapon in hand.
 - better normal ai.
@@ -29,7 +30,8 @@
     - the way red virus frenzy is set in bullet collide is kinda non-intuitive.  Make it better.
     - Clean up the repeated code in Reds move update
 - fix window not resizing 
-
+- if enemies closer than gun barrel they are not hit by bullet
+- bounding box of initial syringe is huge
 
 
 # Done

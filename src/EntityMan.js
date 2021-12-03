@@ -1,12 +1,21 @@
 import { Player } from './Player.js';
-import { Enemy, Enemies } from "./Enemies.js"
-import { TossCoin } from './Math.js'
+import { Enemy, Enemies } from "./Enemies.js";
+import { TossCoin } from './Math.js';
+import { ItemMan, Item, Items } from './Items.js';
+
+
+// const Weapons = Object.freeze({
+//     GUN:   Symbol("weapon")
+// });
 
 export class EntityMan {
     
     static player;
     static enemies;
     static scene;
+    
+    static nextEvent;
+    static delayTemp;
     
     static Init(scene) {
         EntityMan.scene = scene;
@@ -15,7 +24,9 @@ export class EntityMan {
         EntityMan.enemies = scene.add.group({
 			classType: Enemy,
 			runChildUpdate: true,
-			removeCallback: function(enemy) {}
+			removeCallback: function(enemy) {
+			    if(TossCoin(0.5)) ItemMan.addItem(Item.RandomItem(), enemy.getCenter());
+			}
 		});
 		for(let i = 0; i < 5; ++i) { // will be removed later
 		    EntityMan.SpawnEnemy(Enemies.GREEN);
@@ -25,10 +36,59 @@ export class EntityMan {
         EntityMan.SpawnEnemy(Enemies.BLUE);
         EntityMan.SpawnEnemy(Enemies.BLUE);
         // dont need to refresh i think.
+        //-------------------------------------------------------------
+        EntityMan.items = scene.add.group({
+            classType: Item,
+            runChildUpdate: true
+        });
+        scene.physics.add.overlap(EntityMan.enemies, EntityMan.player, damagePlayer);
+        EntityMan.nextEvent = 1000;
+        EntityMan.delayTemp = 50;
+        
     }
     
     static Update(time, delta) {
+        ++EntityMan.delayTemp;
         EntityMan.player.update(time, delta);
+        //-------------------------------------------
+        if(EntityMan.player.score > EntityMan.nextEvent) {
+            
+            switch(EntityMan.nextEvent) {
+                case 1000:  
+                    for(let i = 0; i < 5; ++i)
+		                EntityMan.SpawnEnemy(Enemies.GREEN);
+                    break;
+                case 2000:
+                case 4000:
+                    for(let i = 0; i < 3; ++i)
+		                EntityMan.SpawnEnemy(Enemies.GREEN);
+                    EntityMan.SpawnEnemy(Enemies.BLUE);
+                    break;
+                case 8000:  
+                    EntityMan.SpawnEnemy(Enemies.BLUE);
+                    EntityMan.SpawnEnemy(Enemies.BLUE);
+                    EntityMan.SpawnEnemy(Enemies.RED);
+                    break;
+                case 16000:  
+                    for(let i = 0; i < 5; ++i) {
+		                EntityMan.SpawnEnemy(Enemies.GREEN);
+                        EntityMan.SpawnEnemy(Enemies.BLUE);
+                        EntityMan.SpawnEnemy(Enemies.RED);
+                    }
+                    break;
+                default:
+                    for(let i = 0; i < 5; ++i) {
+                        EntityMan.SpawnEnemy(Enemies.GREEN);
+                        EntityMan.SpawnEnemy(Enemies.BLUE);
+                    }
+                    EntityMan.SpawnEnemy(Enemies.RED);
+                    EntityMan.SpawnEnemy(Enemies.RED);
+                    break;
+            };
+            
+            EntityMan.nextEvent *= 2;
+            
+        }
         
         
     }
@@ -53,6 +113,26 @@ export class EntityMan {
         e.setTarget(this.player); // maybe move to create callback
 	    e.setPipeline('Light2D');
     }
+    
+    
+    
 
 
 };
+
+function damagePlayer(Player1, Enemy1) {
+     if(EntityMan.delayTemp < 50) {
+        return;
+    } else EntityMan.delayTemp = 0;
+    let damageText = EntityMan.scene.add.text(Player1.x+10, Player1.y-20, "-10")
+        .setFontSize(30).setFontFamily("Courier New").setOrigin(0.5).setColor('#FF0000');
+    EntityMan.scene.tweens.add({
+        targets: damageText,
+        alpha: 0,
+        duration: 300,
+        ease: 'Power2',
+        onComplete:function(){
+            damageText.destroy();  
+        }
+    });
+}

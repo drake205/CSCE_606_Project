@@ -1,6 +1,6 @@
 import { GetRandomVec2, TossCoin } from './Math.js'
 
-
+// change this enum to correspond to texture
 export const Enemies = Object.freeze({
     GREEN:   Symbol("greenNorm"),
     RED:     Symbol("redCharge"),
