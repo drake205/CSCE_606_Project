@@ -4,9 +4,6 @@ import { TossCoin } from './Math.js';
 import { ItemMan, Item, Items } from './Items.js';
 
 
-// const Weapons = Object.freeze({
-//     GUN:   Symbol("weapon")
-// });
 
 export class EntityMan {
     
@@ -47,12 +44,23 @@ export class EntityMan {
         
     }
     
+    
+    
     static Update(time, delta) {
         ++EntityMan.delayTemp;
+        // EntityMan.timer += delta;
+        // 
+        
         EntityMan.player.update(time, delta);
         //-------------------------------------------
-        if(EntityMan.player.score > EntityMan.nextEvent) {
-            
+        // Every 10 secs spawn some green enemies.
+        // then at certain times spawn some special guys
+        //-------------------------------------------
+        if(EntityMan.player.score > EntityMan.nextEvent) { //Phaser.Core.TimeStep.getDuration()
+        // if(time/1000 % 10)
+        // if(time/1000 > EntityMan.nextEvent) {
+            // console.log(time/1000);
+            EntityMan.scene.events.emit('nextEvent');
             switch(EntityMan.nextEvent) {
                 case 1000:  
                     for(let i = 0; i < 5; ++i)

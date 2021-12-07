@@ -3,7 +3,7 @@ import { BulletMan } from "./BulletMan.js";
 import { EntityMan } from "./EntityMan.js";
 import { ItemMan } from "./Items.js";
 import { Debug } from "./Debug.js";
-
+import { TitleScreen } from "./TitleScreen.js";
 
 
 const SCALE = 1.6;
@@ -19,18 +19,86 @@ class Game extends Phaser.Scene {
 
     static cameras;
     static light;
-    static music;
+    music;
 
 
     constructor(config) {
-        super(config);
+        super({ key: 'game'});
+        // super(config);
     }
 
 
     init(data) {}
 
+    loading_screen() {
+        //   https://gamedevacademy.org/creating-a-preloading-screen-in-phaser-3/
+        var progressBar = this.add.graphics();
+        var progressBox = this.add.graphics();
+        var width = this.cameras.main.width;
+        var height = this.cameras.main.height;
+        progressBox.fillStyle(0x222222, 0.8);
+        progressBox.fillRect(width/2-160, height/2-25, 320, 50);
+        
+       
+        var loadingText = this.make.text({
+            x: width / 2,
+            y: height / 2 - 50,
+            text: 'Loading...',
+            style: {
+                font: '20px monospace',
+                fill: '#ffffff'
+            }
+        });
+        loadingText.setOrigin(0.5, 0.5);
+        
+        var percentText = this.make.text({
+            x: width / 2,
+            y: height / 2,
+            text: '0%',
+            style: {
+                font: '18px monospace',
+                fill: '#ffffff'
+            }
+        });
+        percentText.setOrigin(0.5, 0.5);
+        
+        var assetText = this.make.text({
+            x: width / 2,
+            y: height / 2 + 50,
+            text: '',
+            style: {
+                font: '18px monospace',
+                fill: '#ffffff'
+            }
+        });
+        assetText.setOrigin(0.5, 0.5);
+        
+        this.load.on('progress', function (value) {
+            percentText.setText(parseInt(value * 100) + '%');
+            progressBar.clear();
+            progressBar.fillStyle(0xffffff, 1);
+            let w = 300 * value;
+            progressBar.fillRect(width/2-150, height/2-15, w, 30);
+        });
+        
+        this.load.on('fileprogress', function (file) {
+            assetText.setText('Loading asset: ' + file.key);
+        });
+        this.load.on('complete', function () {
+            progressBar.destroy();
+            progressBox.destroy();
+            loadingText.destroy();
+            percentText.destroy();
+            assetText.destroy();
+            this.scene.launch('ui');
+            console.log('complete');
+        }, this);
+    }
 
     preload() {
+        this.input.setDefaultCursor('crosshair');
+        this.loading_screen();
+        
         this.load.image({
             key: 'chain',
             url: 'data/gfx/chaingun.png'
@@ -73,12 +141,9 @@ class Game extends Phaser.Scene {
         
         this.load.image({
             key: 'background',
+            url: 'data/gfx/Background.svg',
+            normalMap: 'data/gfx/BackgroundNormal.svg'
             // url: 'data/gfx/backgroundLab.jpg',
-            url: 'data/gfx/Back4.svg',
-            // url: 'data/gfx/background_lab01.jpg',
-            // url: 'data/gfx/brickwall.jpg',
-            normalMap: 'data/gfx/Back4Norm3.svg'
-            // normalMap: 'data/gfx/brickwall_normal.jpg'
         });
         //-----------------------------------
         this.load.audio('game_music', 'data/sfx/music.wav');
@@ -92,16 +157,18 @@ class Game extends Phaser.Scene {
         this.load.text('CovidGreen', 'data/fx/CovidGreen.frag');
         this.load.text('CovidBlue', 'data/fx/CovidBlue.frag');
         this.load.text('CovidVert', 'data/fx/Covid.vert');
+        //--------------------------------------
+        
     }
 
 
     create(data) {
         // change shader to spritesheet. 
-         this.add.shader(
+        this.add.shader(
             new Phaser.Display.BaseShader('---', this.cache.text.get('CovidGreen'), this.cache.text.get('CovidVert')), 
             0, 0, 300, 300, []
         ).setRenderToTexture('virus_green');
-       this.add.shader(
+        this.add.shader(
             new Phaser.Display.BaseShader('----', this.cache.text.get('CovidRed'), this.cache.text.get('CovidVert')),
             0, 0, 500, 500, []
         ).setRenderToTexture('virus_red');
@@ -111,30 +178,66 @@ class Game extends Phaser.Scene {
         ).setRenderToTexture('virus_blue');
         
         this.physics.world.setBounds(0, 0, WIDTH*2, HEIGHT*2);
-        // this.cameras.main.zoom = 1.5;
         this.cameras.main.setBounds(0, 0, WIDTH*2, HEIGHT*2);
 
-        // this.cameras.main.x = 0 // camera position on canvas
-        // this.cameras.main.y = 0;
         this.add.image(0, 0, 'background')
             .setPipeline('Light2D')
             .setOrigin(0, 0)
             .setDisplaySize(WIDTH*2, HEIGHT*2);
             
         this.lights.enable().setAmbientColor(0x555555);
-        Game.light  = this.lights.addLight(0, 0, 200);
+        Game.light  = this.lights.addLight(0, 0, 150);
+        var heart_light = this.lights.addLight(1689, 1015, 100, 0xFF3333);
+        this.hlt = this.tweens.add({
+            targets: heart_light,
+            radius: 500,
+            duration: 1000,
+            ease: 'Sine.InOut',
+            repeat: -1, 
+            yoyo: true
+        });
+        // update light speed update music
+        this.events.on('nextEvent', function (value) {  // make nextEvent happen with time instead.
+                // hlt.timeScale *= 1.5;
+                // this.music.rate += 0.05;
+                // use another tween to raise the music slowly
+                // console.log("set")
+                // ('duration', curAngle, true);
+        }, this);
         
         EntityMan.Init(this);
         ItemMan.Init(this);
         BulletMan.Init(this);
         Debug.Init(this);
         
-        this.music = this.sound.add('game_music', {loop: true, volume: 0.2});
+        this.music = this.sound.add('game_music', {loop: true, volume: 0.2, rate: 0.5});
         this.music.play();
 
         this.input.setDefaultCursor('crosshair');
+        this.timer = 0;
     }
 
+    musicRate(time, dt) {
+        // let rate = (dt/10000)/this.music.duration; // 1:21. for 10 loops
+        // this.music.rate += rate; 
+        // this.hlt.timeScale += rate*2;
+        
+        // this.music.rate = this.music.seek/this.music.duration;
+        // music.seek; cur pos
+        
+        // console.log(this.music.rate);
+        this.timer += dt;
+        while(this.timer > 1000) {
+            this.timer -= 1000;
+        //     this.timeS += 1;
+        //     let rate = (this.timeS/this.music.duration)/3; // timeSec/musicTime/loopsOfSong till we reach 1.
+            let rate = 1/this.music.duration/10;
+            this.music.rate += rate; 
+            this.hlt.timeScale += 4*rate;
+            console.log(this.music.rate);
+        }
+        //
+    }
 
     update(time, delta) {
         this.cameras.main.startFollow(EntityMan.player);
@@ -142,12 +245,13 @@ class Game extends Phaser.Scene {
         const wp = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
         pointer.worldX = wp.x;
         pointer.worldY = wp.y;
-        
+        this.musicRate(time, delta);
         EntityMan.Update(time, delta);
         BulletMan.Update(time, delta);
         let pc = EntityMan.player.getCenter();
         Game.light.setPosition(pc.x, pc.y);
         Debug.update(time, delta);
+        
     }
 }
 
@@ -160,7 +264,8 @@ class UIScene extends Phaser.Scene {
     scoreText;
     
     constructor(config) {
-        super({ key: 'UIScene', active: true });
+        // super({ key: 'UIScene', active: true });
+        super({ key: 'ui'});
     }
 
     create(data)
@@ -215,7 +320,7 @@ const gameConfig = {
     type: Phaser.WEBGL,
     canvas: myCustomCanvas,
     context: myCustomContext,
-    maxLights: 10,
+    maxLights: 11,
     width: clientWidth,
     height: clientHeight,
     // antialias: false,
@@ -241,6 +346,6 @@ const gameConfig = {
     // render: {
     //     roundPixels: true,
     // },
-    scene: [Game, UIScene]
+    scene: [TitleScreen, Game, UIScene]
  };
 var game = new Phaser.Game(gameConfig);

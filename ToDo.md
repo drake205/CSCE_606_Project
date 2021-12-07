@@ -1,12 +1,9 @@
 # To Do: Main
-- Items
-- Weapons
 - Death
-- Score
-- Enemy Spawning
-
+- destroy bullet if not in camera.
 
 ## To Do: Misc
+- if bullet outside camera destroy
 - Change virus shaders to a spritesheet. Running them as a shader is kinda dumb
 - add weapons
     - show weapon in hand.
@@ -22,16 +19,17 @@
 - Arms are on top of bullet
 - camera zoom amount in relation to canvas dimensions
 - circle draw AA is bad. using a non-generated texture may look better
-
-## Bugs
+- make a camera bounds collision function
+-- same for world bounds
 - Red Virus
-    - Possible error with big red being shot off screen 
-    - if big red not on camer in frenzy mode he gets stuck - Note: may have fixed this one.
     - the way red virus frenzy is set in bullet collide is kinda non-intuitive.  Make it better.
     - Clean up the repeated code in Reds move update
+
+## Bugs
 - fix window not resizing 
 - if enemies closer than gun barrel they are not hit by bullet
-- bounding box of initial syringe is huge
+- bounding box of initial chain syringe is huge
+- 
 
 
 # Done
@@ -50,7 +48,9 @@
 - better way to handle wall keyup velocity. (i had this done but by integrating into phaser it made it worse.)
     - fixed but now issue when a+d or w+s is back
 - perhaps add seperate event handling for each input event
-
+- Red Virus
+    - Possible error with big red being shot off screen 
+    - if big red not on camer in frenzy mode he gets stuck - Note: may have fixed this one.
 
 # Ideas
 ================================================================================

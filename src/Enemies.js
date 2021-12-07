@@ -2,10 +2,15 @@ import { GetRandomVec2, TossCoin } from './Math.js'
 
 // change this enum to correspond to texture
 export const Enemies = Object.freeze({
-    GREEN:   Symbol("greenNorm"),
-    RED:     Symbol("redCharge"),
-    BLUE:    Symbol("blueGrow")
+    GREEN:   "virus_green",
+    RED:     "virus_red",
+    BLUE:    "virus_blue"
 });
+
+
+function testDest() {
+    console.log("destroy");
+}
 
 export class Enemy extends Phaser.GameObjects.Sprite {
 
@@ -18,11 +23,16 @@ export class Enemy extends Phaser.GameObjects.Sprite {
     constructor(scene, x, y, texture) {
         super(scene, x, y, texture);
         scene.physics.world.enable(this);
-        this.body.setCollideWorldBounds(true);
+        if(texture != Enemies.RED)      // makes my janky camera/world bounds check work
+            this.body.setCollideWorldBounds(true);
+        
         scene.add.existing(this);
         this.setScale(0.25);
         this.angle = 0;
         this.setDepth(0.2);
+        
+      
+        
     }
     
     
@@ -92,10 +102,12 @@ export class Enemy extends Phaser.GameObjects.Sprite {
                             const x1 = ((Math.sign(Math.cos(this.rotation)) < 0) ? this.body.width : 0); // make this better written
                             const y1 = ((Math.sign(Math.sin(this.rotation)) < 0) ? this.body.height : 0);
                             
-                            if(this.scene.cameras.main.worldView.contains(this.body.x + x1, this.body.y + y1))
+                            if(this.scene.cameras.main.worldView.contains(this.body.x + x1, this.body.y + y1)) {          // contain to camera.
                                 if(!this.scene.cameras.main.worldView.contains(this.body.x + x, this.body.y + y)) {
                                     this.body.setVelocity(0);
                                 }
+                            }
+                            
                     }
                    
                 }
