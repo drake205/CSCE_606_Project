@@ -94,7 +94,7 @@ export class EntityMan {
             };
             
             EntityMan.nextScoreEvent *= 2;
-            
+            EntityMan.prevEnemyCount = EntityMan.enemies.countActive();
         }
         
         
