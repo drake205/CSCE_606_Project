@@ -119,8 +119,7 @@ export class Item extends Phaser.GameObjects.Sprite {
     }
     
     
-    update(t, dt) {
-    }
+    update(t, dt) {}
     
     static RandomItem() {
         return TossCoin(0.3) ? ItemIcons.CHAIN : ItemIcons.SHOTGUN;

@@ -3,17 +3,16 @@ import { normalize } from './Math.js';
 import { Item, Items, ItemSound } from './Items.js';
 
 
-
-
-
-
 export class Player extends Phaser.GameObjects.Sprite
 {
+    
     #a1; #a2;
     #weapon; #ammo
     #shoot;
     #keys;
-    #TempText;
+    light;
+    particles;
+    lives;
     
     score;
     cooldown;
@@ -65,7 +64,21 @@ export class Player extends Phaser.GameObjects.Sprite
             RIGHT: Phaser.Input.Keyboard.KeyCodes.RIGHT
         });
         this.weapon = scene.add.item(x, y, Items.SLINGSHOT);
-
+        //--------------------------------------------------
+        this.particles = scene.add.particles('playerfrag');
+        this.particles.createEmitter({
+            angle: { min: 240, max: 300 },
+            speed: { min: 400, max: 600 },
+            quantity: { min: 2, max: 10 },
+            lifespan: 4000,
+            alpha: { start: 1, end: 0 },
+            scale: { min: 0.05, max: 0.4 },
+            rotate: { start: 0, end: 360, ease: 'Back.easeOut' },
+            gravityY: 800,
+            on: false
+        });
+        this.lives = 3;
+        this.light = this.scene.lights.addLight(0, 0, 150);
     }
 
     
@@ -77,6 +90,7 @@ export class Player extends Phaser.GameObjects.Sprite
     
     update(time, deltaTime) {
         const pc = this.body.center;
+        this.light.setPosition(pc.x, pc.y);
         this.angle = Phaser.Math.Angle.Between(
             pc.x, pc.y, 
             this.scene.input.mousePointer.worldX, this.scene.input.mousePointer.worldY
@@ -192,7 +206,68 @@ export class Player extends Phaser.GameObjects.Sprite
     }
     
     
+    static DoDamage(enemy, player) {
+        
+        if(!player.alive()) return;
+        console.log('respawning');
+        // should only be one at a time.
+        // burst player
+        player.particles.emitParticleAt(player.x, player.y);
+        // disable movement.
+        player.body.moves = false;
+        // disable input. keyboard disable may be redundant
+        player.scene.input.keyboard.enabled = false;
+        player.scene.input.off('pointerdown', player.pointerdown, player);
+        // subtract lives
+        --player.lives;
+        // remove light
+        player.light.setVisible(false);
+        // update UI
+        BulletMan.scene.events.emit('livesChange', player.lives);
+        // check if gameover
+        if(player.lives <= 0) {
+            player.alpha = 0; // eh
+            player.a1.alpha = 0;
+            player.a2.alpha = 0;
+            player.a2.alpha = 0;
+            player.weapon.alpha = 0;
+            // player.scene.pause();
+            // physics pause()
+            let gm = player.scene.sound.get('game_music');
+            player.scene.tweens.add({
+                targets:  gm,
+                volume:   0,
+                duration: 6000
+            });
+            player.scene.cameras.main.fadeOut(6000);
+            // return;
+            // go to gameover transition scene. or show image. destroy this scene?
+        } else {
+            // make player dissapear.
+            // set status to dead.
+            // make the player reapear.
+            player.scene.tweens.add({
+                targets: [ player, player.a1, player.a2, player.weapon ],
+                alpha: { start: 0, to: 1},
+                ease: 'Bounce.In',
+                delay: 3000,
+                onComplete: function () {
+                    // enable movement.   some of this is redundant same with above
+                    player.body.moves = true;
+                    player.scene.input.keyboard.enabled = true;
+                    player.light.setVisible(true);
+                    player.scene.input.on('pointerdown', player.mousedown, player);
+                }
+            });
+        }
+    }
+    
+    alive() {
+        return this.alpha == 1;
+    }
+    
 };
+
 
 Phaser.GameObjects.GameObjectFactory.register('player', function (x, y, r) {
 	const pl1 = new Player(this.scene, x, y, r);

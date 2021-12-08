@@ -38,9 +38,10 @@ export class EntityMan {
             classType: Item,
             runChildUpdate: true
         });
-        scene.physics.add.overlap(EntityMan.enemies, EntityMan.player, damagePlayer);
+        scene.physics.add.overlap(EntityMan.enemies, EntityMan.player, Player.DoDamage);
         EntityMan.nextEvent = 1000;
         EntityMan.delayTemp = 50;
+        //-----------------------------------------------------
         
     }
     
@@ -106,14 +107,14 @@ export class EntityMan {
         let e;
         switch(type) {
             case Enemies.GREEN:
-        	    e = EntityMan.enemies.get(spawnloc.x, spawnloc.y, 'virus_green');
+        	    e = EntityMan.enemies.get(spawnloc.x, spawnloc.y, type);        // in here as there could be enemy specific spawning later.
         	    break;
             case Enemies.RED:
-                e = EntityMan.enemies.get(spawnloc.x, spawnloc.y, 'virus_red');
+                e = EntityMan.enemies.get(spawnloc.x, spawnloc.y, type);
         	    e.hp = 2;
         	    break;
         	case Enemies.BLUE:
-                e = EntityMan.enemies.get(spawnloc.x, spawnloc.y, 'virus_blue');
+                e = EntityMan.enemies.get(spawnloc.x, spawnloc.y, type);
         	    e.hp = 3;
         	    break;
         };
@@ -129,18 +130,26 @@ export class EntityMan {
 };
 
 function damagePlayer(Player1, Enemy1) {
-     if(EntityMan.delayTemp < 50) {
+     if(EntityMan.delayTemp < 50) { // change this to use delta time.
         return;
     } else EntityMan.delayTemp = 0;
-    let damageText = EntityMan.scene.add.text(Player1.x+10, Player1.y-20, "-10")
-        .setFontSize(30).setFontFamily("Courier New").setOrigin(0.5).setColor('#FF0000');
-    EntityMan.scene.tweens.add({
-        targets: damageText,
-        alpha: 0,
-        duration: 300,
-        ease: 'Power2',
-        onComplete:function(){
-            damageText.destroy();  
-        }
-    });
+    
+    // let damageText = EntityMan.scene.add.text(Player1.x+10, Player1.y-20, "-10")
+    //     .setFontSize(30).setFontFamily("Courier New").setOrigin(0.5).setColor('#FF0000');
+    // EntityMan.scene.tweens.add({
+    //     targets: damageText,
+    //     alpha: 0,
+    //     duration: 300,
+    //     ease: 'Power2',
+    //     onComplete: function() {
+    //         damageText.destroy();  
+    //     }
+    // });
+    
+    // this.input.on('pointerdown', function (pointer) {
+
+        
+
+    // });
+    
 }

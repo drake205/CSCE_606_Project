@@ -3,30 +3,27 @@ import { BulletMan } from "./BulletMan.js";
 import { EntityMan } from "./EntityMan.js";
 import { ItemMan } from "./Items.js";
 import { Debug } from "./Debug.js";
-import { TitleScreen } from "./TitleScreen.js";
+import { UserInterface, TitleScreen, ImageButton } from "./TitleScreen.js";
 
 
 const SCALE = 1.6;
 const WIDTH = 1280*SCALE;
 const HEIGHT = 720*SCALE;
 
-let clientWidth = document.documentElement.clientWidth
-let clientHeight = document.documentElement.clientHeight
+let clientWidth = document.documentElement.clientWidth;
+let clientHeight = document.documentElement.clientHeight;
 
 
 
 class Game extends Phaser.Scene {
 
     static cameras;
-    static light;
     music;
 
 
     constructor(config) {
         super({ key: 'game'});
-        // super(config);
     }
-
 
     init(data) {}
 
@@ -90,14 +87,17 @@ class Game extends Phaser.Scene {
             loadingText.destroy();
             percentText.destroy();
             assetText.destroy();
-            this.scene.launch('ui');
-            console.log('complete');
         }, this);
     }
 
     preload() {
         this.input.setDefaultCursor('crosshair');
         this.loading_screen();
+        
+        this.load.image({
+            key: 'playerfrag',
+            url: 'data/gfx/playerFrag.svg'
+        });
         
         this.load.image({
             key: 'chain',
@@ -186,7 +186,6 @@ class Game extends Phaser.Scene {
             .setDisplaySize(WIDTH*2, HEIGHT*2);
             
         this.lights.enable().setAmbientColor(0x555555);
-        Game.light  = this.lights.addLight(0, 0, 150);
         var heart_light = this.lights.addLight(1689, 1015, 100, 0xFF3333);
         this.hlt = this.tweens.add({
             targets: heart_light,
@@ -215,7 +214,20 @@ class Game extends Phaser.Scene {
 
         this.input.setDefaultCursor('crosshair');
         this.timer = 0;
+        this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
+            // this.lights.shutdown(); // destroy
+            // this.registry.destroy();
+            // this.events.off();
+            this.time.delayedCall(1000, () => {
+    			this.scene.start('gameover', { fadeIn: true, score: EntityMan.player.score })
+    		});
+        });
+        
+        // this.scene.wake('ui'); 
+        this.scene.launch('ui'); 
+        this.scene.bringToTop('ui');
     }
+
 
     musicRate(time, dt) {
         // let rate = (dt/10000)/this.music.duration; // 1:21. for 10 loops
@@ -226,18 +238,19 @@ class Game extends Phaser.Scene {
         // music.seek; cur pos
         
         // console.log(this.music.rate);
-        this.timer += dt;
-        while(this.timer > 1000) {
-            this.timer -= 1000;
-        //     this.timeS += 1;
-        //     let rate = (this.timeS/this.music.duration)/3; // timeSec/musicTime/loopsOfSong till we reach 1.
-            let rate = 1/this.music.duration/10;
-            this.music.rate += rate; 
-            this.hlt.timeScale += 4*rate;
-            console.log(this.music.rate);
-        }
+        // this.timer += dt;
+        // while(this.timer > 1000) {
+        //     this.timer -= 1000;
+        // //     this.timeS += 1;
+        // //     let rate = (this.timeS/this.music.duration)/3; // timeSec/musicTime/loopsOfSong till we reach 1.
+        //     let rate = 1/this.music.duration/10;
+        //     this.music.rate += rate; 
+        //     this.hlt.timeScale += 4*rate;
+        //     console.log(this.music.rate);
+        // }
         //
     }
+
 
     update(time, delta) {
         this.cameras.main.startFollow(EntityMan.player);
@@ -245,11 +258,8 @@ class Game extends Phaser.Scene {
         const wp = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
         pointer.worldX = wp.x;
         pointer.worldY = wp.y;
-        this.musicRate(time, delta);
         EntityMan.Update(time, delta);
         BulletMan.Update(time, delta);
-        let pc = EntityMan.player.getCenter();
-        Game.light.setPosition(pc.x, pc.y);
         Debug.update(time, delta);
         
     }
@@ -257,39 +267,44 @@ class Game extends Phaser.Scene {
 
 
 
-class UIScene extends Phaser.Scene {
 
-    score;
-    ammoText;
-    scoreText;
-    
+class GameOver extends Phaser.Scene {
+
     constructor(config) {
-        // super({ key: 'UIScene', active: true });
-        super({ key: 'ui'});
+        super({key: 'gameover'});
     }
 
-    create(data)
-    {
-        this.score = 0;
-        this.scoreText = this.add.text(10, 50, 'Score: 0', { fill: '#0f0' });
-        this.ammoText = this.add.text(10, 80, 'Ammo: ∞', { fill: '#0f0' });
-        
-        
-        var ourGame = this.scene.get('default');
-
-        ourGame.events.on('addScore', function (value) {
-            this.score += value;
-            this.scoreText.setText('Score: ' + this.score);
-        }, this);
-        
-        ourGame.events.on('ammoChange', function (value) {
-            if(value <= 0) value = '∞';
-            this.ammoText.setText('Ammo: ' + value);
-        }, this);
+    preload() {
+        this.load.image({ key: 'gameoverTxt', url: 'data/gfx/gameover.png' });
+        this.load.image({ key: 'playagainbtn', url: 'data/gfx/PlayAgainButton.svg' });
+        this.load.image({ key: 'mainmenubtn', url: 'data/gfx/MainMenuButton.svg' });
     }
 
-};
 
+    create(data) {
+        let w = this.sys.canvas.width;
+        let h = this.sys.canvas.height;
+        this.logo = this.add.image(w/2, h/6, 'gameoverTxt').setOrigin(0.5, 0.5).setScale(0.8);
+        this.scoreTxt = this.add.text(w/2, h/3, 'Final Score: ' + data.score, { fill: '#0f0' }).setFontSize(60).setOrigin(0.5, 0.5);
+        this.mm = this.add.ImgButton(w/2, h/1.8, 'mainmenubtn', () => this.mainMenu()).setOrigin(0.5, 0.5);
+        this.rs = this.add.ImgButton(w/2, h/1.5, 'playagainbtn', () => this.playAgain()).setOrigin(0.5, 0.5);
+        // main menu button
+    }
+    
+    playAgain() {
+        // gotta do this. else states are left-over from different systems
+        this.scene.remove('game');
+        this.scene.add('game', Game, false);
+    	this.scene.start('game', { fadeIn: true });
+    }
+    
+    mainMenu() {
+        this.scene.remove('game');
+        this.scene.add('game', Game, false);
+        this.scene.start('default', { fadeIn: true })
+    }
+     
+}
 
 
 
@@ -346,6 +361,6 @@ const gameConfig = {
     // render: {
     //     roundPixels: true,
     // },
-    scene: [TitleScreen, Game, UIScene]
+    scene: [TitleScreen, Game, UserInterface, GameOver]
  };
 var game = new Phaser.Game(gameConfig);

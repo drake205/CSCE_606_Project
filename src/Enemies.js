@@ -1,6 +1,6 @@
 import { GetRandomVec2, TossCoin } from './Math.js'
 
-// change this enum to correspond to texture
+
 export const Enemies = Object.freeze({
     GREEN:   "virus_green",
     RED:     "virus_red",
@@ -8,9 +8,6 @@ export const Enemies = Object.freeze({
 });
 
 
-function testDest() {
-    console.log("destroy");
-}
 
 export class Enemy extends Phaser.GameObjects.Sprite {
 
@@ -18,13 +15,14 @@ export class Enemy extends Phaser.GameObjects.Sprite {
     type;
     v = 70;
     
+    
     skip = 0; // big only. probably be better if I do it based on time or something.s
     
     constructor(scene, x, y, texture) {
         super(scene, x, y, texture);
         scene.physics.world.enable(this);
-        if(texture != Enemies.RED)      // makes my janky camera/world bounds check work
-            this.body.setCollideWorldBounds(true);
+        // if(texture != Enemies.RED)      // makes my janky camera/world bounds check work
+            // this.body.setCollideWorldBounds(true); // why should they collide world bounds? force to collide world bounds if you want them spawning inside the map.
         
         scene.add.existing(this);
         this.setScale(0.25);
@@ -42,15 +40,17 @@ export class Enemy extends Phaser.GameObjects.Sprite {
 	}
     
     #updateRotation() {
+        
         const c = this.getCenter();
-        if(this.target) {
-            const tc = this.target.getCenter();
-            const rotation = Phaser.Math.Angle.Between(c.x, c.y, tc.x, tc.y);
+        const tc = this.target.getCenter();
+        const rotation = Phaser.Math.Angle.Between(c.x, c.y, tc.x, tc.y);
+        
+        if(this.target.alive()) {
             this.setRotation(rotation);
             //  game.physics.arcade.velocityFromRotation(rotation, 150, this.body.velocity);
 		} else {
 		    // make them go the opposite way
-		    this.rotation = -this.rotation;
+		    this.setRotation(Phaser.Math.Angle.Reverse(rotation));
 		}
     }
     
@@ -79,7 +79,8 @@ export class Enemy extends Phaser.GameObjects.Sprite {
                             this.hp = 1e12;
                             // // wait some time
                             if(this.skip < 50) { 
-                                ++(this.skip); 
+                                ++(this.skip);  // use dt to measure skip.
+                                // this.body.stop(); would be better
                                 this.body.acceleration.x = 0;
                                 this.body.acceleration.y = 0;
                                 this.body.velocity.x = 0;

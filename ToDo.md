@@ -1,6 +1,8 @@
 # To Do: Main
 - Death
 - destroy bullet if not in camera.
+- change my ticks to use delta time.
+- use  .setCircle(45); for better collisions
 
 ## To Do: Misc
 - if bullet outside camera destroy

@@ -1,5 +1,5 @@
 
-class ImageButton extends Phaser.GameObjects.Image {
+export class ImageButton extends Phaser.GameObjects.Image {
     
     constructor(scene, x, y, texture, callback) {
         super(scene, x, y, texture);
@@ -24,7 +24,7 @@ class ImageButton extends Phaser.GameObjects.Image {
     
     
     enterButtonHoverState() {
-        // add a border or make lighter
+        // add a border or make lighter. 2nd image that appears on hover.
         this.setTint(0x1287CD);
     }
     
@@ -47,6 +47,51 @@ Phaser.GameObjects.GameObjectFactory.register('ImgButton', function (x, y, textu
 });
 
 
+
+export class UserInterface extends Phaser.Scene {
+
+    score;
+    ammoText;
+    scoreText;
+    livesText;
+    
+    constructor(config) {
+        super({ key: 'ui'});
+    }
+    
+    preload() {}
+    
+    create(data)
+    {
+        this.score = 0;
+        this.scoreText = this.add.text(10, 50, 'Score: 0', { fill: '#0f0' });
+        this.ammoText = this.add.text(10, 80, 'Ammo: ∞', { fill: '#0f0' });
+        this.livesText = this.add.text(10, 110, 'Lives: 3', { fill: '#0f0' });
+        
+        
+        var ourGame = this.scene.get('game');
+
+        ourGame.events.on('addScore', function (value) {
+            this.score += value;
+            this.scoreText.setText('Score: ' + this.score);
+        }, this);
+        
+        ourGame.events.on('ammoChange', function (value) {
+            if(value <= 0) value = '∞';
+            this.ammoText.setText('Ammo: ' + value);
+        }, this);
+        
+        ourGame.events.on('livesChange', function (value) {
+            this.livesText.setText('Lives: ' + value);
+            if(value <= 0) {
+                this.scene.restart();
+                this.scene.sleep('ui');
+            }
+        }, this);
+        
+    }
+
+};
 
 export class TitleScreen extends Phaser.Scene {
 
@@ -74,12 +119,14 @@ export class TitleScreen extends Phaser.Scene {
         
     play() {
         
-        this.ts.visible = false;
-        this.logo.visible = false;
-        this.pb.visible = false;
-        this.scene.pause();
-        this.scene.launch('game');
-        
+        // this.ts.visible = false;
+        // this.logo.visible = false;
+        // this.pb.visible = false;
+        // this.scene.pause();
+        // this.scene.sleep('default');
+        // this.scene.launch('game');
+        this.scene.switch('game');
     
     }
 }
+
