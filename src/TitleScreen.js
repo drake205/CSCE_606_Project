@@ -50,7 +50,6 @@ Phaser.GameObjects.GameObjectFactory.register('ImgButton', function (x, y, textu
 
 export class UserInterface extends Phaser.Scene {
 
-    score;
     ammoText;
     scoreText;
     livesText;
@@ -63,7 +62,6 @@ export class UserInterface extends Phaser.Scene {
     
     create(data)
     {
-        this.score = 0;
         this.scoreText = this.add.text(10, 50, 'Score: 0', { fill: '#0f0' });
         this.ammoText = this.add.text(10, 80, 'Ammo: ∞', { fill: '#0f0' });
         this.livesText = this.add.text(10, 110, 'Lives: 3', { fill: '#0f0' });
@@ -71,9 +69,8 @@ export class UserInterface extends Phaser.Scene {
         
         var ourGame = this.scene.get('game');
 
-        ourGame.events.on('addScore', function (value) {
-            this.score += value;
-            this.scoreText.setText('Score: ' + this.score);
+        ourGame.events.on('scoreChange', function (value) {
+            this.scoreText.setText('Score: ' + value);
         }, this);
         
         ourGame.events.on('ammoChange', function (value) {
@@ -118,15 +115,7 @@ export class TitleScreen extends Phaser.Scene {
         
         
     play() {
-        
-        // this.ts.visible = false;
-        // this.logo.visible = false;
-        // this.pb.visible = false;
-        // this.scene.pause();
-        // this.scene.sleep('default');
-        // this.scene.launch('game');
         this.scene.switch('game');
-    
     }
 }
 

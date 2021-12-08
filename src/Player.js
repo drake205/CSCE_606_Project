@@ -10,49 +10,46 @@ export class Player extends Phaser.GameObjects.Sprite
     #weapon; #ammo
     #shoot;
     #keys;
+    
+    radius;
+    lives;
     light;
     particles;
-    lives;
     
     score;
     cooldown;
     
+    
     constructor(scene, x, y, r) {
-        let circ = scene.make.graphics()
+        
+        let circBody = scene.make.graphics()
             .fillStyle(0x6666ff)
-            .fillCircle(r, r, r)   // x, y, radius
+            .fillCircle(r, r, r)
             .generateTexture('PlayerBody', r*2, r*2);
-        circ.destroy();
+        circBody.destroy();
+        
         super(scene, x, y, 'PlayerBody');
-        //--------------------------
-        let circ2 = scene.make.graphics()
+        
+        let circArm = scene.make.graphics()
             .fillStyle(0x808080)
             .fillCircle(r, r, r/4)
             .strokeCircle(r,r,r/4)
             .generateTexture('arm', r*2, r*2);
-        circ2.destroy();
-        this.setDepth(0.05); // lame. worked better when was just drawing arms at every loop.
+        circArm.destroy();
+        this.setDepth(0.05);
         this.a1 = scene.add.sprite(x+r, y, 'arm').setDepth(0.1);
         this.a2 = scene.add.sprite(x, y+r, 'arm').setDepth(0.1);
         //--------------------------
-       
         
         scene.physics.world.enable(this);
         this.body.setCollideWorldBounds(true);
         scene.add.existing(this);
+        this.body.setCircle(r);
+        //--------------------------------------------------
         
-        
-        this.angle = 0;
-        this.r = r;
-        this.body.setMaxVelocity(200, 200);
-        this.shoot = false;
-        this.ammo = 0;
-        this.score = 0;
-        this.cooldown = 0;
         scene.input.keyboard.on("keyup", this.keyup, this);
         scene.input.on("pointerdown", this.mousedown, this);
         scene.input.on("pointerup", this.mouseup, this);
-
         this.keys = scene.input.keyboard.addKeys({ 
             W: Phaser.Input.Keyboard.KeyCodes.W, 
             A: Phaser.Input.Keyboard.KeyCodes.A, 
@@ -63,8 +60,9 @@ export class Player extends Phaser.GameObjects.Sprite
             LEFT: Phaser.Input.Keyboard.KeyCodes.LEFT,
             RIGHT: Phaser.Input.Keyboard.KeyCodes.RIGHT
         });
-        this.weapon = scene.add.item(x, y, Items.SLINGSHOT);
+        
         //--------------------------------------------------
+        
         this.particles = scene.add.particles('playerfrag');
         this.particles.createEmitter({
             angle: { min: 240, max: 300 },
@@ -77,8 +75,19 @@ export class Player extends Phaser.GameObjects.Sprite
             gravityY: 800,
             on: false
         });
-        this.lives = 3;
+        
+        //--------------------------------------------------
+        
+        this.weapon = scene.add.item(x, y, Items.SLINGSHOT);
         this.light = this.scene.lights.addLight(0, 0, 150);
+        this.angle = 0;
+        this.radius = r;
+        this.body.setMaxVelocity(200, 200);
+        this.shoot = false;
+        this.ammo = 0;
+        this.score = 0;
+        this.cooldown = 0;
+        this.lives = 3;
     }
 
     
@@ -88,9 +97,8 @@ export class Player extends Phaser.GameObjects.Sprite
     }
 
     
-    update(time, deltaTime) {
+    update(time, dt) {
         const pc = this.body.center;
-        this.light.setPosition(pc.x, pc.y);
         this.angle = Phaser.Math.Angle.Between(
             pc.x, pc.y, 
             this.scene.input.mousePointer.worldX, this.scene.input.mousePointer.worldY
@@ -98,7 +106,7 @@ export class Player extends Phaser.GameObjects.Sprite
         const is_dir = (Math.abs(this.angle) < 1.5708);    // Am i facing left or right?
         
         if(this.shoot) {
-            // wow this is really bad fix this.
+            // messy fix this.
             let outPos = this.weapon.getRightCenter();
             const dir = is_dir ?  -1 : 1;
             let offset = new Phaser.Geom.Point(20, 7*dir);
@@ -114,7 +122,7 @@ export class Player extends Phaser.GameObjects.Sprite
                     
                     this.scene.sound.play(ItemSound.CHAIN);
                     BulletMan.addBullet(Bullets.CHAIN, outPos, this.angle);
-                    // spawn muzzle flash
+                    // To do: spawn muzzle flash
                     --this.ammo;
                     this.scene.events.emit('ammoChange', this.ammo);
                     break;
@@ -125,9 +133,9 @@ export class Player extends Phaser.GameObjects.Sprite
                     break;
                 case Items.SHOTGUN: // lol get it
                     if(this.cooldown > 0) {
-                        --this.cooldown;
+                        this.cooldown -= dt;
                         break;
-                    } else this.cooldown = 5;
+                    } else this.cooldown = 83;
                     this.scene.sound.play(ItemSound.SHOTGUN);
                     let dir1 = Math.sign(this.angle);
                     BulletMan.addBullet(Bullets.SHOTGUN, outPos, this.angle + dir1*0.10);
@@ -146,11 +154,14 @@ export class Player extends Phaser.GameObjects.Sprite
             }
             
         }
-        Phaser.Math.RotateTo(this.a1, pc.x, pc.y, this.angle-0.7854, this.r);   // rotate arms
-        Phaser.Math.RotateTo(this.a2, pc.x, pc.y, this.angle+0.7854, this.r);
-        Phaser.Math.RotateTo(this.weapon, pc.x, pc.y, this.angle, this.r);      // rotate weapon
-        this.weapon.rotation = this.angle;                                      // weapon angle
-        this.weapon.setFlipY(!is_dir);                                           // not upside down.
+        
+        // positioning
+        this.light.setPosition(pc.x, pc.y);
+        Phaser.Math.RotateTo(this.a1, pc.x, pc.y, this.angle-0.7854, this.radius);   // rotate arms
+        Phaser.Math.RotateTo(this.a2, pc.x, pc.y, this.angle+0.7854, this.radius);
+        Phaser.Math.RotateTo(this.weapon, pc.x, pc.y, this.angle, this.radius);      // rotate weapon
+        this.weapon.rotation = this.angle;                                           // weapon angle
+        this.weapon.setFlipY(!is_dir);                                               // not upside down.
     }
     
     
@@ -207,45 +218,40 @@ export class Player extends Phaser.GameObjects.Sprite
     
     
     static DoDamage(enemy, player) {
-        
         if(!player.alive()) return;
-        console.log('respawning');
-        // should only be one at a time.
         // burst player
         player.particles.emitParticleAt(player.x, player.y);
+        // Player disapear & set status to dead. alpha != 1 == dead
+        player.alpha = 0;
+        player.a1.alpha = 0;
+        player.a2.alpha = 0;
+        player.a2.alpha = 0;
+        player.weapon.alpha = 0;
         // disable movement.
         player.body.moves = false;
-        // disable input. keyboard disable may be redundant
+        // disable input. keyboard & mouse event
         player.scene.input.keyboard.enabled = false;
         player.scene.input.off('pointerdown', player.pointerdown, player);
         // subtract lives
         --player.lives;
-        // remove light
+        // turn off light
         player.light.setVisible(false);
         // update UI
         BulletMan.scene.events.emit('livesChange', player.lives);
         // check if gameover
         if(player.lives <= 0) {
-            player.alpha = 0; // eh
-            player.a1.alpha = 0;
-            player.a2.alpha = 0;
-            player.a2.alpha = 0;
-            player.weapon.alpha = 0;
-            // player.scene.pause();
-            // physics pause()
+            // fade out game music
+            const time_ms = 6000;
             let gm = player.scene.sound.get('game_music');
             player.scene.tweens.add({
                 targets:  gm,
                 volume:   0,
-                duration: 6000
+                duration: time_ms
             });
-            player.scene.cameras.main.fadeOut(6000);
-            // return;
-            // go to gameover transition scene. or show image. destroy this scene?
+            // fade out camera
+            player.scene.cameras.main.fadeOut(time_ms);
         } else {
-            // make player dissapear.
-            // set status to dead.
-            // make the player reapear.
+            // make player respawn, Blink in
             player.scene.tweens.add({
                 targets: [ player, player.a1, player.a2, player.weapon ],
                 alpha: { start: 0, to: 1},
@@ -262,9 +268,10 @@ export class Player extends Phaser.GameObjects.Sprite
         }
     }
     
-    alive() {
-        return this.alpha == 1;
-    }
+    
+    alive() { return this.alpha == 1; }
+    
+    
     
 };
 

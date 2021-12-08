@@ -11,13 +11,14 @@ export class EntityMan {
     static enemies;
     static scene;
     
-    static nextEvent;
-    static delayTemp;
+    static nextScoreEvent;
+    static prevEnemyCount;
+    static timer;
+    
     
     static Init(scene) {
         EntityMan.scene = scene;
         EntityMan.player = scene.add.player(scene.physics.world.bounds.centerX, scene.physics.world.bounds.centerY, 40).setOrigin(0.5, 0.5);
-        
         EntityMan.enemies = scene.add.group({
 			classType: Enemy,
 			runChildUpdate: true,
@@ -25,42 +26,39 @@ export class EntityMan {
 			    if(TossCoin(0.5)) ItemMan.addItem(Item.RandomItem(), enemy.getCenter());
 			}
 		});
-		for(let i = 0; i < 5; ++i) { // will be removed later
+		EntityMan.items = scene.add.group({
+            classType: Item,
+            runChildUpdate: true
+        });
+        
+		for(let i = 0; i < 5; ++i)
 		    EntityMan.SpawnEnemy(Enemies.GREEN);
-		  //  EntityMan.SpawnEnemy(TossCoin(0.8) ? Enemies.GREEN : (TossCoin(0.7) ? Enemies.BLUE : Enemies.RED));
-		}
 		EntityMan.SpawnEnemy(Enemies.RED);
         EntityMan.SpawnEnemy(Enemies.BLUE);
         EntityMan.SpawnEnemy(Enemies.BLUE);
         // dont need to refresh i think.
         //-------------------------------------------------------------
-        EntityMan.items = scene.add.group({
-            classType: Item,
-            runChildUpdate: true
-        });
-        scene.physics.add.overlap(EntityMan.enemies, EntityMan.player, Player.DoDamage);
-        EntityMan.nextEvent = 1000;
-        EntityMan.delayTemp = 50;
-        //-----------------------------------------------------
         
+        scene.physics.add.overlap(EntityMan.enemies, EntityMan.player, Player.DoDamage);
+        
+        //-----------------------------------------------------
+        EntityMan.nextScoreEvent = 1000;
+        EntityMan.prevEnemyCount = EntityMan.enemies.countActive();
+        EntityMan.timer = 0;
     }
     
     
     
     static Update(time, delta) {
-        ++EntityMan.delayTemp;
-        // EntityMan.timer += delta;
-        // 
-        
         EntityMan.player.update(time, delta);
-        //-------------------------------------------
-        // Every 10 secs spawn some green enemies.
-        // then at certain times spawn some special guys
-        //-------------------------------------------
-        if(EntityMan.player.score > EntityMan.nextEvent) { //Phaser.Core.TimeStep.getDuration()
-        // if(time/1000 % 10)
-        // if(time/1000 > EntityMan.nextEvent) {
-            // console.log(time/1000);
+        EntityMan.timer += dt;
+        while(EntityMan.timer > 10000) {    // spawn enemy every 10 seconds.
+            EntityMan.SpawnEnemy(Enemies.GREEN);
+            this.timer -= 10000;
+        }
+        
+        // if score or enemies equals the required enemy count move to next event
+        if(EntityMan.player.score > EntityMan.nextScoreEvent || EntityMan.enemies.countActive() >= 3*EntityMan.prevEnemyCount) { 
             EntityMan.scene.events.emit('nextEvent');
             switch(EntityMan.nextEvent) {
                 case 1000:  
@@ -95,9 +93,10 @@ export class EntityMan {
                     break;
             };
             
-            EntityMan.nextEvent *= 2;
+            EntityMan.nextScoreEvent *= 2;
             
         }
+        
         
         
     }
@@ -128,28 +127,3 @@ export class EntityMan {
 
 
 };
-
-function damagePlayer(Player1, Enemy1) {
-     if(EntityMan.delayTemp < 50) { // change this to use delta time.
-        return;
-    } else EntityMan.delayTemp = 0;
-    
-    // let damageText = EntityMan.scene.add.text(Player1.x+10, Player1.y-20, "-10")
-    //     .setFontSize(30).setFontFamily("Courier New").setOrigin(0.5).setColor('#FF0000');
-    // EntityMan.scene.tweens.add({
-    //     targets: damageText,
-    //     alpha: 0,
-    //     duration: 300,
-    //     ease: 'Power2',
-    //     onComplete: function() {
-    //         damageText.destroy();  
-    //     }
-    // });
-    
-    // this.input.on('pointerdown', function (pointer) {
-
-        
-
-    // });
-    
-}

@@ -16,11 +16,13 @@ export class Enemy extends Phaser.GameObjects.Sprite {
     v = 70;
     
     
-    skip = 0; // big only. probably be better if I do it based on time or something.s
+    // skip = 0; // big only. probably be better if I do it based on time or something.s
+    timer = 0;
     
     constructor(scene, x, y, texture) {
         super(scene, x, y, texture);
         scene.physics.world.enable(this);
+        this.body.setCircle(this.displayWidth/2); // this includes frills.
         // if(texture != Enemies.RED)      // makes my janky camera/world bounds check work
             // this.body.setCollideWorldBounds(true); // why should they collide world bounds? force to collide world bounds if you want them spawning inside the map.
         
@@ -28,9 +30,6 @@ export class Enemy extends Phaser.GameObjects.Sprite {
         this.setScale(0.25);
         this.angle = 0;
         this.setDepth(0.2);
-        
-      
-        
     }
     
     
@@ -56,15 +55,11 @@ export class Enemy extends Phaser.GameObjects.Sprite {
     
     
     update(t, dt) {
-        // console.log(this.rotation);
+        // this.setFlipY((Math.abs(this.rotation) < 1.5708));  // i guess this doesnt work with shaders
         // this.setFlipY(this.rotation > 1.5708 && this.rotation < 4.71239);  // i guess this doesnt work with shaders
 
         switch(this.type) {
             case Enemies.BLUE:
-                // var d = +new Date();
-                // this.rotation = 0.04 * Math.cos(d/1000);
-                // Phaser.Math.RotateTo(this, this.x, this.y, 0.04 * Math.cos(d/1000), 0.5);
-                // break;
             case Enemies.GREEN:
                 this.#updateRotation();
                 this.scene.physics.velocityFromRotation(this.rotation, this.v, this.body.velocity);
@@ -74,12 +69,13 @@ export class Enemy extends Phaser.GameObjects.Sprite {
                     this.#updateRotation();
                     this.scene.physics.velocityFromRotation(this.rotation, this.v, this.body.velocity);
                 } else {    // frenzy mode
+                    // near to stopping
                     if(Math.floor(Math.abs(this.body.velocity.x))-5 < 0) {
                             // "turn off" damage
                             this.hp = 1e12;
                             // // wait some time
-                            if(this.skip < 50) { 
-                                ++(this.skip);  // use dt to measure skip.
+                            if(this.timer < 834) { 
+                                this.timer += dt;
                                 // this.body.stop(); would be better
                                 this.body.acceleration.x = 0;
                                 this.body.acceleration.y = 0;
@@ -87,7 +83,8 @@ export class Enemy extends Phaser.GameObjects.Sprite {
                                 this.body.velocity.y = 0;
                                 this.#updateRotation();
                             } else { 
-                                this.skip = 0;
+                                // reset timer.
+                                this.timer = 0;
                                 // turn on damage
                                 this.hp = 1;
                                 // charge
@@ -118,14 +115,6 @@ export class Enemy extends Phaser.GameObjects.Sprite {
         
     }
     
-    
-    move() {
-        // if(target.alive()) {
-            
-        // } else if() {
-            
-        // } else
-    }
     
     
     static SpawnLoc(scene) {

@@ -18,7 +18,7 @@ export class BulletMan {
             classType: Bullet,
             runChildUpdate: true
         });
-        scene.physics.add.overlap(BulletMan.bullets, EntityMan.enemies, doDamage); // or collide
+        scene.physics.add.overlap(BulletMan.bullets, EntityMan.enemies, doDamage); 
         BulletMan.scene = scene;
     }
     
@@ -31,8 +31,8 @@ export class BulletMan {
         const dir = { x: Math.cos(angle), y: Math.sin(angle) };
         b.dir = dir;        // trajectory
         b.rotation = angle; // sprite direction
-        // b.setPipeline('Light2D');
-        switch(type) {
+        // b.setPipeline('Light2D'); // makes bullets too dark
+        switch(type) {  // might be different for a diff bullet.
             case Bullets.SHOTGUN:
             case Bullets.SLINGSHOT:
             case Bullets.CHAIN:
@@ -46,7 +46,6 @@ export class BulletMan {
 
 function score_fade(x, y, score) {
     let scoreText = EntityMan.scene.add.text(x, y, score).setFontSize(30).setFontFamily("Courier New").setOrigin(0.5);
-    // let scoreText = EntityMan.scene.add.text(x, y, score).setFontSize(30).setFontFamily("ＭＳ Ｐゴシック").setOrigin(0.5);
     BulletMan.scene.tweens.add({
         targets: scoreText,
         alpha: 0,
@@ -70,7 +69,7 @@ function doDamage(Bullet, Enemy) {
             Enemy.destroy();        // maybe just reposition off camera. // kill&hide
             EntityMan.SpawnEnemy(Enemy.type);
             EntityMan.player.score += 100;
-            EntityMan.scene.events.emit('addScore', 100);
+            EntityMan.scene.events.emit('scoreChange', EntityMan.player.score);
             score_fade(Enemy.x, Enemy.y, '100');
             break;
         case Enemies.RED:
@@ -81,7 +80,7 @@ function doDamage(Bullet, Enemy) {
                 Enemy.destroy();     
                 EntityMan.SpawnEnemy(Enemy.type);
                 EntityMan.player.score += 500;
-                EntityMan.scene.events.emit('addScore', 500);
+                EntityMan.scene.events.emit('scoreChange', EntityMan.player.score);
                 score_fade(Enemy.x, Enemy.y, '500');
             } else {
                 Enemy.v = 1000;
@@ -96,7 +95,7 @@ function doDamage(Bullet, Enemy) {
                 Enemy.destroy();      
                 EntityMan.SpawnEnemy(Enemy.type);
                 EntityMan.player.score += 300;
-                EntityMan.scene.events.emit('addScore', 300);
+                EntityMan.scene.events.emit('scoreChange', EntityMan.player.score);
                 score_fade(Enemy.x, Enemy.y, '300');
             } else {
                 BulletMan.scene.tweens.add({
@@ -125,8 +124,6 @@ class Bullet extends Phaser.GameObjects.Sprite {
         // this.body.collideWorldBounds = true;
         scene.add.existing(this);
         this.setDepth(0.2);
-        // this.setOrigin(0.3, 0);
-        // if non round bullets also need to set angle
     }
     
     
@@ -137,6 +134,7 @@ class Bullet extends Phaser.GameObjects.Sprite {
         if(this.body.checkWorldBounds()) {
             // this.setVisible(false);
             // this.body.setEnable(false);
+            // console.log('worldbounds');
             this.destroy(); // maybe not destroy. supposed to be expensive.
         }
     }

@@ -197,8 +197,8 @@ class Game extends Phaser.Scene {
         });
         // update light speed update music
         this.events.on('nextEvent', function (value) {  // make nextEvent happen with time instead.
-                // hlt.timeScale *= 1.5;
-                // this.music.rate += 0.05;
+                this.hlt.timeScale *= 1.5;
+                this.music.rate += 0.05;
                 // use another tween to raise the music slowly
                 // console.log("set")
                 // ('duration', curAngle, true);
@@ -215,42 +215,16 @@ class Game extends Phaser.Scene {
         this.input.setDefaultCursor('crosshair');
         this.timer = 0;
         this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
-            // this.lights.shutdown(); // destroy
-            // this.registry.destroy();
-            // this.events.off();
             this.time.delayedCall(1000, () => {
     			this.scene.start('gameover', { fadeIn: true, score: EntityMan.player.score })
     		});
         });
-        
-        // this.scene.wake('ui'); 
         this.scene.launch('ui'); 
         this.scene.bringToTop('ui');
     }
 
 
-    musicRate(time, dt) {
-        // let rate = (dt/10000)/this.music.duration; // 1:21. for 10 loops
-        // this.music.rate += rate; 
-        // this.hlt.timeScale += rate*2;
-        
-        // this.music.rate = this.music.seek/this.music.duration;
-        // music.seek; cur pos
-        
-        // console.log(this.music.rate);
-        // this.timer += dt;
-        // while(this.timer > 1000) {
-        //     this.timer -= 1000;
-        // //     this.timeS += 1;
-        // //     let rate = (this.timeS/this.music.duration)/3; // timeSec/musicTime/loopsOfSong till we reach 1.
-        //     let rate = 1/this.music.duration/10;
-        //     this.music.rate += rate; 
-        //     this.hlt.timeScale += 4*rate;
-        //     console.log(this.music.rate);
-        // }
-        //
-    }
-
+  
 
     update(time, delta) {
         this.cameras.main.startFollow(EntityMan.player);
