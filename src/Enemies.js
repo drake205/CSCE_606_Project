@@ -16,7 +16,6 @@ export class Enemy extends Phaser.GameObjects.Sprite {
     v = 70;
     
     
-    // skip = 0; // big only. probably be better if I do it based on time or something.s
     timer = 0;
     
     constructor(scene, x, y, texture) {

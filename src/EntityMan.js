@@ -49,8 +49,8 @@ export class EntityMan {
     
     
     
-    static Update(time, delta) {
-        EntityMan.player.update(time, delta);
+    static Update(time, dt) {
+        EntityMan.player.update(time, dt);
         EntityMan.timer += dt;
         while(EntityMan.timer > 10000) {    // spawn enemy every 10 seconds.
             EntityMan.SpawnEnemy(Enemies.GREEN);
