@@ -62,7 +62,7 @@ export class UserInterface extends Phaser.Scene {
     
     create(data)
     {
-        this.scoreText = this.add.text(10, 50, 'Score: 0', { fill: '#0f0' });
+        this.scoreText = this.add.text(10, 50, 'Score: 0/100000 (0%)', { fill: '#0f0' });
         this.ammoText = this.add.text(10, 80, 'Ammo: ∞', { fill: '#0f0' });
         this.livesText = this.add.text(10, 110, 'Lives: 3', { fill: '#0f0' });
         
@@ -70,7 +70,7 @@ export class UserInterface extends Phaser.Scene {
         var ourGame = this.scene.get('game');
 
         ourGame.events.on('scoreChange', function (value) {
-            this.scoreText.setText('Score: ' + value);
+            this.scoreText.setText('Score: ' + value + '/100000 (' + (value/100000)*100 + '%)');
         }, this);
         
         ourGame.events.on('ammoChange', function (value) {
@@ -98,8 +98,10 @@ export class TitleScreen extends Phaser.Scene {
 
     preload() {
         this.load.image({ key: 'TitleScreen', url: 'data/gfx/backgroundLab.jpg' });
-        this.load.image({ key: 'Logo', url: 'data/gfx/logo.png' });
+        this.load.image({ key: 'Logo', url: 'data/gfx/logo23.png' });
         this.load.image({ key: 'PlayButton', url: 'data/gfx/PlayButton.svg' });
+        this.load.image({ key: 'CreditsButton', url: 'data/gfx/CreditsButton.svg' });
+        this.load.image({ key: 'MoveKeys', url: 'data/gfx/WASDkeysHelp.svg' });
     }
 
 
@@ -108,15 +110,43 @@ export class TitleScreen extends Phaser.Scene {
         let h = this.sys.canvas.height;
         
         this.ts = this.add.image(0, 0, 'TitleScreen').setOrigin(0, 0).setDisplaySize(w, h);
-        this.logo = this.add.image(w/2, h/6, 'Logo').setOrigin(0.5, 0.5);//.setScale(0.3);//.setDisplaySize(w, h);
+        this.logo = this.add.image(w/2, h/6, 'Logo').setOrigin(0.5, 0.5);
+        this.logo.setScale(Math.min(w / this.logo.displayWidth, h / this.logo.displayHeight)/1.5);
+        if(this.sys.game.device.os.desktop)
+            this.help = this.add.image(w, 0, 'MoveKeys').setOrigin(1, 0);
         this.pb = this.add.ImgButton(w/2, h/2, 'PlayButton', () => this.play()).setOrigin(0.5, 0.5);
+        this.cb = this.add.ImgButton(w/2, h/2+this.pb.displayHeight*1.5, 'CreditsButton', () => this.scene.switch('credits')).setOrigin(0.5, 0.5);
    
     }
         
-        
+  
+
+    
     play() {
         this.scene.switch('game');
-    
     }
+    
 }
 
+export class Credits extends Phaser.Scene {
+
+    constructor(config) {
+        super('credits');
+    }
+
+    preload() {
+        this.load.image({ key: 'CreditsBG', url: 'data/gfx/CreditsScreenV2.svg' });
+        this.load.image({ key: 'mainmenubtn', url: 'data/gfx/MainMenuButton.svg' });
+    }
+
+
+    create(data) {
+        let w = this.sys.canvas.width;
+        let h = this.sys.canvas.height;
+
+        this.cs = this.add.image(0, 0, 'CreditsBG').setOrigin(0, 0).setDisplaySize(w, h);
+        this.mb = this.add.ImgButton(w/2, h/2.5, 'mainmenubtn', () => this.scene.switch('default')).setOrigin(0.5, 0.5);
+        this.mb.setScale(Math.min(w / this.mb.displayWidth, h / this.mb.displayHeight)/4);
+   
+    }
+}

@@ -1,4 +1,4 @@
-import { BulletMan, Bullets } from './BulletMan.js';
+import { BulletMan, Bullets, score_fade } from './BulletMan.js';
 import { normalize } from './Math.js';
 import { Item, Items, ItemSound } from './Items.js';
 
@@ -47,15 +47,17 @@ export class Player extends Phaser.GameObjects.Sprite
         this.body.setCircle(r);
         //--------------------------------------------------
         if(!scene.sys.game.device.os.desktop) {
+            scene.input.addPointer(1);
             this.j1 = scene.plugins.get('rexvirtualjoystickplugin').add(scene, {
-                    x: 100, y: scene.cameras.main.displayHeight-100,
+                    x: 150, y: scene.cameras.main.displayHeight-150,
                     radius: 100,
             });
             this.cursorKeys = this.j1.createCursorKeys()
             this.j2 = scene.plugins.get('rexvirtualjoystickplugin').add(scene, {
-                    x: scene.cameras.main.displayWidth-100, y: scene.cameras.main.displayHeight-100,
+                    x: scene.cameras.main.displayWidth-150, y: scene.cameras.main.displayHeight-150,
                     radius: 100,
             });
+            this.pressedKeys = [];
         }
         //--------------------------------------------------
         
@@ -118,7 +120,8 @@ export class Player extends Phaser.GameObjects.Sprite
                 this.scene.input.mousePointer.worldX, this.scene.input.mousePointer.worldY
             );
         } else {
-            this.angle = this.j2.rotation;
+            if(this.j2.forceX != 0 || this.j2.forceY != 0)
+                this.angle = this.j2.rotation;
         }
         const is_dir = (Math.abs(this.angle) < 1.5708);    // Am i facing left or right?
         
@@ -142,6 +145,8 @@ export class Player extends Phaser.GameObjects.Sprite
                     // To do: spawn muzzle flash
                     --this.ammo;
                     this.scene.events.emit('ammoChange', this.ammo);
+                    if(this.ammo <= 0)
+                        this.SetWeapon(Items.SLINGSHOT, this.ammo);
                     break;
                 case Items.SLINGSHOT:
                     this.scene.sound.play(ItemSound.SLINGSHOT);
@@ -162,13 +167,13 @@ export class Player extends Phaser.GameObjects.Sprite
                     this.shoot = false;
                     --this.ammo;
                     this.scene.events.emit('ammoChange', this.ammo);
+                    if(this.ammo <= 0)
+                        this.SetWeapon(Items.SLINGSHOT, this.ammo);
                     break;
                     
                 default:
             }
-            if(this.ammo <= 0) {
-                this.SetWeapon(Items.SLINGSHOT, this.ammo);
-            }
+            
             
         }
         
@@ -192,6 +197,19 @@ export class Player extends Phaser.GameObjects.Sprite
             D |= this.cursorKeys.right.isDown;
             W |= this.cursorKeys.up.isDown;
             S |= this.cursorKeys.down.isDown;
+            if(this.pressedKeys[1] != A)
+                this.keyup({keyCode: 65});
+            if(this.pressedKeys[2] != D) // 
+                this.keyup({keyCode: 68});
+            if(this.pressedKeys[3] != W)
+                this.keyup({keyCode: 87});
+            if(this.pressedKeys[4] != S)
+                this.keyup({keyCode: 83});
+                
+            this.pressedKeys[1] = A; 
+            this.pressedKeys[2] = D; 
+            this.pressedKeys[3] = W; 
+            this.pressedKeys[4] = S; 
         }
         
         if(A && !D)
@@ -229,8 +247,10 @@ export class Player extends Phaser.GameObjects.Sprite
 
 
     SetWeapon(weaponType, ammo) {
+        this.scene.sound.play('pickup_item');
         if(weaponType == this.weapon.type) {
             this.ammo += ammo;
+            score_fade(this.x+50, this.y-50, '+'+ammo);
         } else {
             this.weapon.destroy();
             this.weapon = this.scene.add.item(this.x, this.y, weaponType);

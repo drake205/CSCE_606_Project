@@ -4,7 +4,7 @@ import { EntityMan } from "./EntityMan.js";
 import { Enemies } from "./Enemies.js";
 import { ItemMan } from "./Items.js";
 import { Debug } from "./Debug.js";
-import { UserInterface, TitleScreen, ImageButton } from "./TitleScreen.js";
+import { UserInterface, TitleScreen, ImageButton, Credits } from "./TitleScreen.js";
 // import {VirtualJoyStickPlugin} from './joystickPlugin.js'
 
 const SCALE = 1.6;
@@ -150,7 +150,8 @@ class Game extends Phaser.Scene {
         this.load.audio('game_music', 'data/sfx/music.wav');
         this.load.audio('shoot_pop', 'data/sfx/cork_edit.mp3');
         this.load.audio('shoot_twang', 'data/sfx/shoot.mp3');
-        this.load.audio('shoot_bang', 'data/sfx/hit_3.wav');
+        this.load.audio('shoot_bang', 'data/sfx/thwack-01.wav');
+        this.load.audio('pickup_item', 'data/sfx/pickup.wav');
         this.load.audio('death1', 'data/sfx/blub_hurt1.wav');
         this.load.audio('death2', 'data/sfx/blub_hurt2.wav');
         //-----------------------------------
@@ -160,7 +161,7 @@ class Game extends Phaser.Scene {
         this.load.text('CovidVert', 'data/fx/Covid.vert');
         //--------------------------------------
         if(!this.sys.game.device.os.desktop)
-            this.load.plugin('rexvirtualjoystickplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexvirtualjoystickplugin.min.js', true);
+            this.load.plugin('rexvirtualjoystickplugin', 'site/rexvirtualjoystickplugin.min.js', true);
     }
 
 
@@ -366,10 +367,12 @@ const gameConfig = {
     maxLights: 11,
     width: clientWidth,
     height: clientHeight,
+    //  parent: divId,
     // antialias: false,
     // premultipliedAlpha: false,
     // mipmapFilter: 'LINEAR_MIPMAP_LINEAR',
     roundPixels: true,
+    // mode: Phaser.Scale.SHOW_ALL,
     mode: Phaser.Scale.FIT,
     "callbacks.postBoot": function() {
         // document.getElementsByTagName("canvas")[0].style.width = clientWidth + "px";
@@ -396,7 +399,7 @@ const gameConfig = {
     // render: {
     //     roundPixels: true,
     // },
-    scene: [TitleScreen, Game, UserInterface, GameOver]
+    scene: [TitleScreen, Credits, Game, UserInterface, GameOver]
  };
 var game = new Phaser.Game(gameConfig);
 

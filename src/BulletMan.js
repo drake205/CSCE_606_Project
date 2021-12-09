@@ -44,7 +44,7 @@ export class BulletMan {
 };
 
 
-function score_fade(x, y, score) {
+export function score_fade(x, y, score) {
     let scoreText = EntityMan.scene.add.text(x, y, score).setFontSize(30).setFontFamily("Courier New").setOrigin(0.5);
     BulletMan.scene.tweens.add({
         targets: scoreText,
