@@ -3,6 +3,8 @@
 - destroy bullet if not in camera.
 - change my ticks to use delta time.
 - use  .setCircle(45); for better collisions
+- big red is stuck again error.
+- error with something big red being destroyed in one hit with shotgun
 
 ## To Do: Misc
 - if bullet outside camera destroy

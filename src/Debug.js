@@ -1,5 +1,6 @@
 import { EntityMan } from "./EntityMan.js";
 import { ItemMan, ItemIcons } from "./Items.js";
+import { Enemies } from "./Enemies.js";
 
 
 export class Debug 
@@ -15,6 +16,7 @@ export class Debug
     static spawnGunsText;
 
     static txt;
+    static invincible = false;
 
     static Init(scene) {
         Debug.scene = scene;
@@ -44,6 +46,31 @@ export class Debug
             { fill: '#0f0' }
         ).setInteractive()
          .on('pointerdown', () => Debug.spawnGuns() );
+        
+        this.spawnRedText = scene.add.text(0, 0, 
+            'Spawn Red', 
+            { fill: '#0f0' }
+        ).setInteractive()
+         .on('pointerdown', () => Debug.spawnEnemy(Enemies.RED) );
+         
+         
+        this.spawnGreenText = scene.add.text(0, 0, 
+            'Spawn Green', 
+            { fill: '#0f0' }
+        ).setInteractive()
+         .on('pointerdown', () => Debug.spawnEnemy(Enemies.GREEN));
+         
+        this.spawnBlueText = scene.add.text(0, 0, 
+            'Spawn Blue', 
+            { fill: '#0f0' }
+        ).setInteractive()
+         .on('pointerdown', () => Debug.spawnEnemy(Enemies.BLUE) );
+         
+         this.invincibleText = scene.add.text(0, 0, 
+            'invincible: off', 
+            { fill: '#0f0' }
+        ).setInteractive()
+         .on('pointerdown', () => Debug.invincibleSet(Debug.showEnemies ^= 1) );
     }
 
     static updateClickCountText(showEnemies) {
@@ -59,11 +86,43 @@ export class Debug
         ItemMan.addItem(ItemIcons.SLINGSHOT, {x: EntityMan.player.x+100, y: EntityMan.player.y  });
     }
 
+    static spawnEnemy(type) {
+        let pc = EntityMan.player.body.center;
+        console.log(pc);
+        let e = EntityMan.enemies.get(pc.x+200, pc.y, type);
+        e.type = type;
+        e.setTarget(EntityMan.player); // maybe move to create callback
+	    e.setPipeline('Light2D');
+	    
+	    switch(type) {
+            case Enemies.GREEN:
+        	   break;
+            case Enemies.RED:
+        	    e.hp = 2;
+        	    break;
+        	case Enemies.BLUE:
+        	    e.hp = 3;
+        	    break;
+        };
+    }
+    
+    static invincibleSet(state) {
+        // Debug.invincible
+        if(state)
+            EntityMan.player.health = 1e6;
+        else
+            EntityMan.player.health = 3;
+    } 
 
     static update(t, dt) {
+        // Debug.updateClickCountText(Debug.showEnemies);
         const cam_tl = Debug.scene.cameras.main.worldView;
         this.clickButton.setText('ToggleEnemies: '+JSON.stringify(Debug.showEnemies)).setPosition(cam_tl.x+5, cam_tl.y+5);
         this.spawnGunsText.setText('Spawn Guns').setPosition(cam_tl.x+300, cam_tl.y+5);
+        this.spawnBlueText.setText('Spawn Blue').setPosition(cam_tl.x+300, cam_tl.y+50);
+        this.spawnGreenText.setText('Spawn Green').setPosition(cam_tl.x+300, cam_tl.y+100);
+        this.spawnRedText.setText('Spawn Red').setPosition(cam_tl.x+300, cam_tl.y+150);
+        this.invincibleText.setText('inf-lives: '+Debug.invincible).setPosition(cam_tl.x+300, cam_tl.y+180);
         Debug.txt.setText(
             // "WorldCenter: " + JSON.stringify(Debug.wc) + '\n' +
             // "WorldBounds: " + JSON.stringify(Debug.wb) + '\n' +

@@ -1,6 +1,7 @@
 import { Player } from './Player.js';
 import { BulletMan } from "./BulletMan.js";
 import { EntityMan } from "./EntityMan.js";
+import { Enemies } from "./Enemies.js";
 import { ItemMan } from "./Items.js";
 import { Debug } from "./Debug.js";
 import { UserInterface, TitleScreen, ImageButton } from "./TitleScreen.js";
@@ -198,7 +199,7 @@ class Game extends Phaser.Scene {
         // update light speed update music
         this.events.on('nextEvent', function (value) {  // make nextEvent happen with time instead.
                 this.hlt.timeScale *= 1.5;
-                this.music.rate += 0.05;
+                this.music.rate += 0.01;
                 // use another tween to raise the music slowly
                 // console.log("set")
                 // ('duration', curAngle, true);
@@ -216,9 +217,42 @@ class Game extends Phaser.Scene {
         this.timer = 0;
         this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
             this.time.delayedCall(1000, () => {
-    			this.scene.start('gameover', { fadeIn: true, score: EntityMan.player.score })
+    			this.scene.start('gameover', { fadeIn: true, score: EntityMan.player.score, win: false })
     		});
         });
+        this.events.once('gamewin', ()=>{
+             // kill all enemies.
+            EntityMan.enemies.children.each(child => {
+                switch(child.type) {
+                    case Enemies.BLUE:
+                    case Enemies.GREEN:
+                        EntityMan.scene.sound.play('death1');
+                        break;
+                    case Enemies.RED:
+                        EntityMan.scene.sound.play('death2');
+                        break;
+                }
+                child.destroy();
+            });
+            // explode them w/confetti.
+            // hide ui
+            this.events.emit('livesChange', 0);
+            // launch gameover
+            
+            const time_ms = 2000;
+            // let gm = EntityMan.scene.sound.get('game_music');
+            this.tweens.add({
+                targets:  this.music,
+                volume:   0,
+                duration: time_ms,
+                onComplete: ()=>{
+                    this.scene.launch('gameover', { fadeIn: true, score: EntityMan.player.score, win: true });
+                    this.scene.bringToTop('gameover');
+                }
+            });
+        }, this);
+        
+        
         this.scene.launch('ui'); 
         this.scene.bringToTop('ui');
     }
@@ -244,6 +278,7 @@ class Game extends Phaser.Scene {
 
 class GameOver extends Phaser.Scene {
 
+    
     constructor(config) {
         super({key: 'gameover'});
     }
@@ -252,31 +287,47 @@ class GameOver extends Phaser.Scene {
         this.load.image({ key: 'gameoverTxt', url: 'data/gfx/gameover.png' });
         this.load.image({ key: 'playagainbtn', url: 'data/gfx/PlayAgainButton.svg' });
         this.load.image({ key: 'mainmenubtn', url: 'data/gfx/MainMenuButton.svg' });
+        this.load.image({ key: 'victory', url: 'data/gfx/victory4.png' });
+        this.load.audio('fanfare', 'data/sfx/tempWinSong.mp3');
     }
 
 
     create(data) {
         let w = this.sys.canvas.width;
         let h = this.sys.canvas.height;
-        this.logo = this.add.image(w/2, h/6, 'gameoverTxt').setOrigin(0.5, 0.5).setScale(0.8);
+        let logo_id = (data.win) ?  'victory' : 'gameoverTxt'; 
+        this.logo = this.add.image(w/2, h/6, logo_id).setOrigin(0.5, 0.5).setScale(0.8);
         this.scoreTxt = this.add.text(w/2, h/3, 'Final Score: ' + data.score, { fill: '#0f0' }).setFontSize(60).setOrigin(0.5, 0.5);
         this.mm = this.add.ImgButton(w/2, h/1.8, 'mainmenubtn', () => this.mainMenu()).setOrigin(0.5, 0.5);
         this.rs = this.add.ImgButton(w/2, h/1.5, 'playagainbtn', () => this.playAgain()).setOrigin(0.5, 0.5);
-        // main menu button
+        // the music and logo are pretty lame
+        if(data.win) {
+            this.music = this.sound.add('fanfare', {loop: true });
+            this.music.play();
+            
+        }
+            // this.music = this.sound.play('fanfare',  { loop: true });
     }
     
     playAgain() {
         // gotta do this. else states are left-over from different systems
+        this.music.stop();
         this.scene.remove('game');
         this.scene.add('game', Game, false);
     	this.scene.start('game', { fadeIn: true });
     }
     
     mainMenu() {
+        this.music.stop();
         this.scene.remove('game');
         this.scene.add('game', Game, false);
         this.scene.start('default', { fadeIn: true })
     }
+    
+    
+    
+    
+    
      
 }
 
@@ -301,8 +352,9 @@ const contextCreationConfig = {
     powerPreference: 'default'
 };
 
-const myCustomContext = myCustomCanvas.getContext('webgl2', contextCreationConfig);
-
+// const myCustomContext = myCustomCanvas.getContext('webgl2', contextCreationConfig);
+const myCustomContext = myCustomCanvas.getContext('webgl', contextCreationConfig);
+myCustomContext.getExtension('OES_standard_derivatives');
 
 // type: Phaser.AUTO,
 const gameConfig = {

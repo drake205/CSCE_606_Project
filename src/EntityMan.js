@@ -14,7 +14,8 @@ export class EntityMan {
     static nextScoreEvent;
     static prevEnemyCount;
     static timer;
-    
+    static score2win = 100000;
+    // static score2win = 150000;
     
     static Init(scene) {
         EntityMan.scene = scene;
@@ -45,6 +46,8 @@ export class EntityMan {
         EntityMan.nextScoreEvent = 1000;
         EntityMan.prevEnemyCount = EntityMan.enemies.countActive();
         EntityMan.timer = 0;
+        
+        
     }
     
     
@@ -97,9 +100,16 @@ export class EntityMan {
             EntityMan.prevEnemyCount = EntityMan.enemies.countActive();
         }
         
-        
+        if(EntityMan.player.score >= EntityMan.score2win) {
+            // start game win event
+            EntityMan.scene.events.emit('gamewin');
+            // no more spawns allows
+            EntityMan.timer = 0;
+            // "you win" swoops in or grows idk.
+        }
         
     }
+    
     
     static SpawnEnemy(type) {
         let spawnloc = Enemy.SpawnLoc(EntityMan.scene); // maybe just pass scene in

@@ -1,4 +1,3 @@
-#version 300 es
 #extension GL_OES_standard_derivatives : enable
 precision mediump float;
 
@@ -7,7 +6,6 @@ precision mediump float;
 uniform sampler2D iChannel0;
 uniform vec2 resolution;
 uniform float time;
-layout(location = 0) out vec4   FragColor;
 
 #define S(v)   smoothstep(1.5, 0.0, (v)/fwidth(v))  
 #define L(x,y) length(vec2(x,y))
@@ -27,24 +25,24 @@ void main()
     float A = abs(a)/1.6;
     float n = 6.0;
     float l = length(U);
-    FragColor-=FragColor;
+    gl_FragColor-=gl_FragColor;
     
     // body
     setT(t);
-    FragColor.g = S(l-1.0)*S(c*l);              // disk * pie
+    gl_FragColor.g = S(l-1.0)*S(c*l);              // disk * pie
     
     // eye
     a = a/1.6 - 1.5/(2.0-F);            // local eye coordinates
-    FragColor += S(L(a,l-0.5)-0.25);            //   white part
-    FragColor.rgb -= S(L(a,l-0.5)-0.12)*2.0;        //   black part
+    gl_FragColor += S(L(a,l-0.5)-0.25);            //   white part
+    gl_FragColor.rgb -= S(L(a,l-0.5)-0.12)*2.0;        //   black part
     
     
     // hairs
     setT(t-0.3*(l-1.0));                // deform: small time delay
     A = fract(n*(2.0-A)/(2.0-F))-0.5;   // local hair ordinate
-    FragColor.g += (S(L(A,2.*(l-1.2))-0.2)      //   disk + bar
+    gl_FragColor.g += (S(L(A,2.*(l-1.2))-0.2)      //   disk + bar
              + S(abs(A)-0.1)*S(abs(l-1.1)-0.1))*S(c*l);
              
-    if(FragColor.g > 0.0)
-        FragColor.a = 0.5;
+    if(gl_FragColor.g > 0.0)
+        gl_FragColor.a = 0.5;
 }
