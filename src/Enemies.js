@@ -37,7 +37,7 @@ export class Enemy extends Phaser.GameObjects.Sprite {
 		this.target = target; // if target alive?
 	}
     
-    #updateRotation() {
+    updateRotation() {
         
         const c = this.getCenter();
         const tc = this.target.getCenter();
@@ -60,12 +60,12 @@ export class Enemy extends Phaser.GameObjects.Sprite {
         switch(this.type) {
             case Enemies.BLUE:
             case Enemies.GREEN:
-                this.#updateRotation();
+                this.updateRotation();
                 this.scene.physics.velocityFromRotation(this.rotation, this.v, this.body.velocity);
                 break;
             case Enemies.RED:
                 if(this.hp == 2) {
-                    this.#updateRotation();
+                    this.updateRotation();
                     this.scene.physics.velocityFromRotation(this.rotation, this.v, this.body.velocity);
                 } else {    // frenzy mode
                     // near to stopping
@@ -80,7 +80,7 @@ export class Enemy extends Phaser.GameObjects.Sprite {
                                 this.body.acceleration.y = 0;
                                 this.body.velocity.x = 0;
                                 this.body.velocity.y = 0;
-                                this.#updateRotation();
+                                this.updateRotation();
                             } else { 
                                 // reset timer.
                                 this.timer = 0;

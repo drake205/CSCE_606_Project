@@ -116,6 +116,7 @@ export class TitleScreen extends Phaser.Scene {
         
     play() {
         this.scene.switch('game');
+    
     }
 }
 

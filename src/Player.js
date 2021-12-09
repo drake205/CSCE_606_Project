@@ -46,6 +46,14 @@ export class Player extends Phaser.GameObjects.Sprite
         scene.add.existing(this);
         this.body.setCircle(r);
         //--------------------------------------------------
+        if(!scene.sys.game.device.os.desktop) {
+            this.j1 = scene.plugins.get('rexvirtualjoystickplugin').add(scene, {
+                    x: 100, y: 100,
+                    radius: 100,
+            });
+            this.cursorKeys = this.j1.createCursorKeys()
+        }
+        //--------------------------------------------------
         
         scene.input.keyboard.on("keyup", this.keyup, this);
         scene.input.on("pointerdown", this.mousedown, this);
@@ -59,6 +67,7 @@ export class Player extends Phaser.GameObjects.Sprite
             DOWN: Phaser.Input.Keyboard.KeyCodes.DOWN,
             LEFT: Phaser.Input.Keyboard.KeyCodes.LEFT,
             RIGHT: Phaser.Input.Keyboard.KeyCodes.RIGHT
+            
         });
         
         //--------------------------------------------------
@@ -166,10 +175,16 @@ export class Player extends Phaser.GameObjects.Sprite
     
     
     keydown() {
-        const A = this.keys.A.isDown || this.keys.LEFT.isDown;
-        const D = this.keys.D.isDown || this.keys.RIGHT.isDown;
-        const W = this.keys.W.isDown || this.keys.UP.isDown;
-        const S = this.keys.S.isDown || this.keys.DOWN.isDown;
+        let A = this.keys.A.isDown || this.keys.LEFT.isDown;
+        let D = this.keys.D.isDown || this.keys.RIGHT.isDown;
+        let W = this.keys.W.isDown || this.keys.UP.isDown;
+        let S = this.keys.S.isDown || this.keys.DOWN.isDown;
+        if(!this.scene.sys.game.device.os.desktop) {
+            A |= this.cursorKeys.left.isDown;
+            D |= this.cursorKeys.right.isDown;
+            W |= this.cursorKeys.up.isDown;
+            S |= this.cursorKeys.down.isDown;
+        }
         
         if(A && !D)
             this.body.velocity.x -= this.body.maxVelocity.x;
