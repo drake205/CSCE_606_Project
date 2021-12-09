@@ -52,6 +52,10 @@ export class Player extends Phaser.GameObjects.Sprite
                     radius: 100,
             });
             this.cursorKeys = this.j1.createCursorKeys()
+            this.j2 = scene.plugins.get('rexvirtualjoystickplugin').add(scene, {
+                    x: 200, y: 100,
+                    radius: 100,
+            });
         }
         //--------------------------------------------------
         
@@ -108,10 +112,14 @@ export class Player extends Phaser.GameObjects.Sprite
     
     update(time, dt) {
         const pc = this.body.center;
-        this.angle = Phaser.Math.Angle.Between(
-            pc.x, pc.y, 
-            this.scene.input.mousePointer.worldX, this.scene.input.mousePointer.worldY
-        );
+        if(this.scene.sys.game.device.os.desktop) {
+            this.angle = Phaser.Math.Angle.Between(
+                pc.x, pc.y, 
+                this.scene.input.mousePointer.worldX, this.scene.input.mousePointer.worldY
+            );
+        } else {
+            this.angle = this.j2.angle;
+        }
         const is_dir = (Math.abs(this.angle) < 1.5708);    // Am i facing left or right?
         
         if(this.shoot) {
