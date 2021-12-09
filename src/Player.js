@@ -48,12 +48,12 @@ export class Player extends Phaser.GameObjects.Sprite
         //--------------------------------------------------
         if(!scene.sys.game.device.os.desktop) {
             this.j1 = scene.plugins.get('rexvirtualjoystickplugin').add(scene, {
-                    x: 100, y: 100,
+                    x: 100, y: scene.cameras.main.displayHeight-100,
                     radius: 100,
             });
             this.cursorKeys = this.j1.createCursorKeys()
             this.j2 = scene.plugins.get('rexvirtualjoystickplugin').add(scene, {
-                    x: 200, y: 100,
+                    x: scene.cameras.main.displayWidth-100, y: scene.cameras.main.displayHeight-100,
                     radius: 100,
             });
         }
@@ -118,7 +118,7 @@ export class Player extends Phaser.GameObjects.Sprite
                 this.scene.input.mousePointer.worldX, this.scene.input.mousePointer.worldY
             );
         } else {
-            this.angle = this.j2.angle;
+            this.angle = this.j2.rotation;
         }
         const is_dir = (Math.abs(this.angle) < 1.5708);    // Am i facing left or right?
         
