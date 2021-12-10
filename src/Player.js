@@ -95,6 +95,8 @@ export class Player extends Phaser.GameObjects.Sprite
         
         this.weapon = scene.add.item(x, y, Items.SLINGSHOT);
         this.light = this.scene.lights.addLight(0, 0, 150);
+        // this.light.setIntensity(1.5);
+        // this.light.radius = 100;
         this.angle = 0;
         this.radius = r;
         this.body.setMaxVelocity(200, 200);
@@ -273,12 +275,14 @@ export class Player extends Phaser.GameObjects.Sprite
         // disable movement.
         player.body.moves = false;
         // disable input. keyboard & mouse event
-        player.scene.input.keyboard.enabled = false;
+        // player.scene.input.keyboard.enabled = false;
         player.scene.input.off('pointerdown', player.pointerdown, player);
         // subtract lives
         --player.lives;
         // turn off light
-        player.light.setVisible(false);
+        player.light.setIntensity(0.01); // dont turn off completely. bug in phaser makes screen go black.
+        // player.light.setIntensity(3);
+        console.log(player.light.intensity);
         // update UI
         BulletMan.scene.events.emit('livesChange', player.lives);
         // check if gameover
@@ -303,9 +307,10 @@ export class Player extends Phaser.GameObjects.Sprite
                 onComplete: function () {
                     // enable movement.   some of this is redundant same with above
                     player.body.moves = true;
-                    player.scene.input.keyboard.enabled = true;
-                    player.light.setVisible(true);
+                    // player.scene.input.keyboard.enabled = true;
+                    player.light.setIntensity(1);
                     player.scene.input.on('pointerdown', player.mousedown, player);
+                    // player.body.stop(); // clear any leftover velocity
                 }
             });
         }

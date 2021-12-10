@@ -143,7 +143,8 @@ class Game extends Phaser.Scene {
         this.load.image({
             key: 'background',
             url: 'data/gfx/Background.svg',
-            normalMap: 'data/gfx/BackgroundNormal.svg'
+            // normalMap: 'data/gfx/BackgroundNormal.svg'
+            normalMap: 'data/gfx/NormalThread4.svg'
             // url: 'data/gfx/backgroundLab.jpg',
         });
         //-----------------------------------
@@ -190,6 +191,7 @@ class Game extends Phaser.Scene {
             
         this.lights.enable().setAmbientColor(0x555555);
         var heart_light = this.lights.addLight(1689, 1015, 100, 0xFF3333);
+        // heart_light.setIntensity(2)
         this.hlt = this.tweens.add({
             targets: heart_light,
             radius: 500,
@@ -300,27 +302,30 @@ class GameOver extends Phaser.Scene {
         let logo_id = (data.win) ?  'victory' : 'gameoverTxt'; 
         this.logo = this.add.image(w/2, h/6, logo_id).setOrigin(0.5, 0.5).setScale(0.8);
         this.scoreTxt = this.add.text(w/2, h/3, 'Final Score: ' + data.score, { fill: '#0f0' }).setFontSize(60).setOrigin(0.5, 0.5);
-        this.mm = this.add.ImgButton(w/2, h/1.8, 'mainmenubtn', () => this.mainMenu()).setOrigin(0.5, 0.5);
-        this.rs = this.add.ImgButton(w/2, h/1.5, 'playagainbtn', () => this.playAgain()).setOrigin(0.5, 0.5);
+        this.mm = this.add.ImgButton(w/2, h/1.8, 'mainmenubtn', () => this.mainMenu(data.win)).setOrigin(0.5, 0.5);
+        this.rs = this.add.ImgButton(w/2, h/1.5, 'playagainbtn', () => this.playAgain(data.win)).setOrigin(0.5, 0.5);
         // the music and logo are pretty lame
         if(data.win) {
             this.music = this.sound.add('fanfare', {loop: true });
             this.music.play();
-            
+        } else {
+            // this.music = this.sound.add('fanfare', {loop: true });
+            // this.music.play();
         }
-            // this.music = this.sound.play('fanfare',  { loop: true });
     }
     
-    playAgain() {
+    playAgain(win) {
         // gotta do this. else states are left-over from different systems
-        this.music.stop();
+        if(win)
+            this.music.stop();
         this.scene.remove('game');
         this.scene.add('game', Game, false);
     	this.scene.start('game', { fadeIn: true });
     }
     
-    mainMenu() {
-        this.music.stop();
+    mainMenu(win) {
+        if(win)
+            this.music.stop();
         this.scene.remove('game');
         this.scene.add('game', Game, false);
         this.scene.start('default', { fadeIn: true })
