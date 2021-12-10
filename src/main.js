@@ -1,11 +1,9 @@
-import { Player } from './Player.js';
 import { BulletMan } from "./BulletMan.js";
 import { EntityMan } from "./EntityMan.js";
 import { Enemies } from "./Enemies.js";
 import { ItemMan } from "./Items.js";
-import { Debug } from "./Debug.js";
-import { UserInterface, TitleScreen, ImageButton, Credits } from "./TitleScreen.js";
-// import {VirtualJoyStickPlugin} from './joystickPlugin.js'
+// import { Debug } from "./Debug.js";
+import { UserInterface, TitleScreen, Credits } from "./TitleScreen.js";
 
 const SCALE = 1.6;
 const WIDTH = 1280*SCALE;
@@ -203,22 +201,20 @@ class Game extends Phaser.Scene {
         // update light speed update music
         this.events.on('nextEvent', function (value) {  // make nextEvent happen with time instead.
                 this.hlt.timeScale *= 1.5;
-                this.music.rate += 0.01;
+                this.music.rate += 0.07;
                 // use another tween to raise the music slowly
-                // console.log("set")
-                // ('duration', curAngle, true);
         }, this);
         
         EntityMan.Init(this);
         ItemMan.Init(this);
         BulletMan.Init(this);
-        Debug.Init(this);
+        // Debug.Init(this);
         
         this.music = this.sound.add('game_music', {loop: true, volume: 0.2, rate: 0.5});
         this.music.play();
 
         this.input.setDefaultCursor('crosshair');
-        this.timer = 0;
+        this.timer = 0; // i dont think i use this anymore
         this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
             this.time.delayedCall(1000, () => {
     			this.scene.start('gameover', { fadeIn: true, score: EntityMan.player.score, win: false })
@@ -272,7 +268,7 @@ class Game extends Phaser.Scene {
         pointer.worldY = wp.y;
         EntityMan.Update(time, delta);
         BulletMan.Update(time, delta);
-        Debug.update(time, delta);
+        // Debug.update(time, delta);
         
     }
 }
@@ -328,7 +324,7 @@ class GameOver extends Phaser.Scene {
             this.music.stop();
         this.scene.remove('game');
         this.scene.add('game', Game, false);
-        this.scene.start('default', { fadeIn: true })
+        this.scene.start('default', { fadeIn: true });
     }
     
     
@@ -392,18 +388,7 @@ const gameConfig = {
             debugShowVelocity: true // and keep this ON.
         }
     },
-    // plugins: {
-    //     global: [{
-    //         key: 'rexVirtualJoyStick',
-    //         plugin: VirtualJoyStickPlugin,
-    //         start: false
-    //     }]
-    // },
-    // renderer: { mipmapFilter: 'LINEAR_MIPMAP_LINEAR' },
-    // renderer: { mipmapFilter: 'NEAREST_MIPMAP_LINEAR' },
-    // render: {
-    //     roundPixels: true,
-    // },
+
     scene: [TitleScreen, Credits, Game, UserInterface, GameOver]
  };
 var game = new Phaser.Game(gameConfig);

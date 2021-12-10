@@ -70,7 +70,8 @@ export class UserInterface extends Phaser.Scene {
         var ourGame = this.scene.get('game');
 
         ourGame.events.on('scoreChange', function (value) {
-            this.scoreText.setText('Score: ' + value + '/100000 (' + (value/100000)*100 + '%)');
+            // parseFloat("123.456")
+            this.scoreText.setText('Score: ' + value + '/100000 (' + ((value/100000)*100).toFixed(2) + '%)');
         }, this);
         
         ourGame.events.on('ammoChange', function (value) {
