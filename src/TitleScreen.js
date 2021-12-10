@@ -62,15 +62,17 @@ export class UserInterface extends Phaser.Scene {
     
     create(data)
     {
-        this.scoreText = this.add.text(10, 50, 'Score: 0/100000 (0%)', { fill: '#0f0' });
-        this.ammoText = this.add.text(10, 80, 'Ammo: ∞', { fill: '#0f0' });
-        this.livesText = this.add.text(10, 110, 'Lives: 3', { fill: '#0f0' });
+        this.scoreText = this.add.text(10, 50, 'Score: 0' , {fontFamily: 'Courier New', fontSize: 20, fill: '#0f0' });
+        this.gameText = this.add.text(10, 20, 'Game Progress: 0%', {fontFamily: 'Courier New', fontSize: 20, fill: '#0f0' });
+        this.ammoText = this.add.text(10, 80, 'Ammo: ∞', {fontFamily: 'Courier New', fontSize: 20, fill: '#0f0' });
+        this.livesText = this.add.text(10, 110, 'Lives: 3', {fontFamily: 'Courier New', fontSize: 20, fill: '#0f0' });
         
         // on destruction this
         var ourGame = this.scene.get('game');
 
         ourGame.events.on('scoreChange', function (value) {
-            this.scoreText.setText('Score: ' + value + '/100000 (' + ((value/100000)*100).toFixed(2) + '%)');
+            this.scoreText.setText('Score: ' + value);
+            this.gameText.setText('Game Progress: ' + ((value/100000)*100).toFixed(2) + '%');
         }, this);
         
         ourGame.events.on('ammoChange', function (value) {
