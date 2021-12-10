@@ -1,11 +1,17 @@
 import { BulletMan, Bullets, score_fade } from './BulletMan.js';
-import { Items, ItemSound } from './Items.js';
+import { Item, Items, ItemSound } from './Items.js';
+import { normalize } from './Math.js';
+
 
 
 export class Player extends Phaser.GameObjects.Sprite
 {
     
-    
+      
+    #a1; #a2;
+    #weapon; #ammo
+    #shoot;
+    #keys;
     
     radius;
     lives;
