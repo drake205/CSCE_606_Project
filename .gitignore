@@ -3,5 +3,6 @@ _other/*
 ; data/*
 .c9/*
 emrun.py
+ToDo.md
 makefile
 documentation
