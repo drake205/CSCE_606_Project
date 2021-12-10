@@ -8,10 +8,10 @@ export class Player extends Phaser.GameObjects.Sprite
 {
     
       
-    #a1; #a2;
-    #weapon; #ammo
-    #shoot;
-    #keys;
+    a1; a2;
+    weapon; ammo
+    shoot;
+    keys;
     
     radius;
     lives;

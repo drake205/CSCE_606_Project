@@ -14,7 +14,7 @@ export class EntityMan {
     static nextScoreEvent;
     static prevEnemyCount;
     static timer;
-    static score2win = 100000;
+    static score2win = 88000;
     
     static Init(scene) {
         EntityMan.scene = scene;
