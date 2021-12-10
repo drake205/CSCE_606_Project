@@ -136,7 +136,7 @@ export class Credits extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image({ key: 'CreditsBG', url: 'data/gfx/CreditsScreenV2.svg' });
+        this.load.image({ key: 'CreditsBG', url: 'data/gfx/CreditsScreen.png' });
         this.load.image({ key: 'mainmenubtn', url: 'data/gfx/MainMenuButton.svg' });
     }
 
@@ -146,7 +146,7 @@ export class Credits extends Phaser.Scene {
         let h = this.sys.canvas.height;
 
         this.cs = this.add.image(0, 0, 'CreditsBG').setOrigin(0, 0).setDisplaySize(w, h);
-        this.mb = this.add.ImgButton(w/2, h/2.5, 'mainmenubtn', () => this.scene.switch('default')).setOrigin(0.5, 0.5);
+        this.mb = this.add.ImgButton(w/2, h/2.5, 'mainmenubtn', () => this.scene.switch('default')).setOrigin(0.55, 0.55);
         this.mb.setScale(Math.min(w / this.mb.displayWidth, h / this.mb.displayHeight)/4);
    
     }
