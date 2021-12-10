@@ -282,7 +282,7 @@ export class Player extends Phaser.GameObjects.Sprite
         // turn off light
         player.light.setIntensity(0.01); // dont turn off completely. bug in phaser makes screen go black.
         // player.light.setIntensity(3);
-        console.log(player.light.intensity);
+        // console.log(player.light.intensity);
         // update UI
         BulletMan.scene.events.emit('livesChange', player.lives);
         // check if gameover
@@ -293,7 +293,10 @@ export class Player extends Phaser.GameObjects.Sprite
             player.scene.tweens.add({
                 targets:  gm,
                 volume:   0,
-                duration: time_ms
+                duration: time_ms,
+                onComplete: function() {
+                    gm.destroy();
+                }
             });
             // fade out camera
             player.scene.cameras.main.fadeOut(time_ms);

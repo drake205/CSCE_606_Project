@@ -216,10 +216,12 @@ class Game extends Phaser.Scene {
         this.input.setDefaultCursor('crosshair');
         this.timer = 0; // i dont think i use this anymore
         this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
+            // this.registry.destroy();
+            // this.events.off();
             this.time.delayedCall(1000, () => {
-    			this.scene.start('gameover', { fadeIn: true, score: EntityMan.player.score, win: false })
-    		});
-        });
+    			this.scene.start('gameover', { fadeIn: true, score: EntityMan.player.score, win: false });
+    		}, this);
+        }, this);
         this.events.once('gamewin', ()=>{
              // kill all enemies.
             EntityMan.enemies.children.each(child => {
@@ -253,8 +255,14 @@ class Game extends Phaser.Scene {
         }, this);
         
         
-        this.scene.launch('ui'); 
-        this.scene.bringToTop('ui');
+
+        // if(this.scene.isSleeping('ui')) {
+        //     this.scene.wake('ui'); 
+        //     this.scene.bringToTop('ui');
+        // } else {
+            this.scene.launch('ui');
+        // }
+        
     }
 
 
@@ -307,15 +315,22 @@ class GameOver extends Phaser.Scene {
         } else {
             // this.music = this.sound.add('fanfare', {loop: true });
             // this.music.play();
+            // this.events.on('transitioncomplete', function(fromScene) { 
+                // this.scene.remove('game');
+            // });
         }
     }
     
     playAgain(win) {
-        // gotta do this. else states are left-over from different systems
+        
         if(win)
             this.music.stop();
+        // gotta do this. else states are left-over from different systems. if you managed different systems music, lights globally maybe it would fix.
+        // bad way to do this, but easiest for now.
         this.scene.remove('game');
         this.scene.add('game', Game, false);
+        this.scene.remove('ui');
+        this.scene.add('ui', UserInterface, false);
     	this.scene.start('game', { fadeIn: true });
     }
     
@@ -324,6 +339,8 @@ class GameOver extends Phaser.Scene {
             this.music.stop();
         this.scene.remove('game');
         this.scene.add('game', Game, false);
+        this.scene.remove('ui');
+        this.scene.add('ui', UserInterface, false);
         this.scene.start('default', { fadeIn: true });
     }
     

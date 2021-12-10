@@ -66,11 +66,10 @@ export class UserInterface extends Phaser.Scene {
         this.ammoText = this.add.text(10, 80, 'Ammo: ∞', { fill: '#0f0' });
         this.livesText = this.add.text(10, 110, 'Lives: 3', { fill: '#0f0' });
         
-        
+        // on destruction this
         var ourGame = this.scene.get('game');
 
         ourGame.events.on('scoreChange', function (value) {
-            // parseFloat("123.456")
             this.scoreText.setText('Score: ' + value + '/100000 (' + ((value/100000)*100).toFixed(2) + '%)');
         }, this);
         
@@ -82,6 +81,7 @@ export class UserInterface extends Phaser.Scene {
         ourGame.events.on('livesChange', function (value) {
             this.livesText.setText('Lives: ' + value);
             if(value <= 0) {
+                this.scene.sendToBack('ui');
                 this.scene.restart();
                 this.scene.sleep('ui');
             }
