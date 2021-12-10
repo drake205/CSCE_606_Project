@@ -91,7 +91,7 @@ export class Debug
         console.log(pc);
         let e = EntityMan.enemies.get(pc.x+200, pc.y, type);
         e.type = type;
-        e.setTarget(EntityMan.player); // maybe move to create callback
+        e.setTarget(EntityMan.player); 
 	    e.setPipeline('Light2D');
 	    
 	    switch(type) {

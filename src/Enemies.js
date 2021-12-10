@@ -22,8 +22,7 @@ export class Enemy extends Phaser.GameObjects.Sprite {
         super(scene, x, y, texture);
         scene.physics.world.enable(this);
         this.body.setCircle(this.displayWidth/2); // this includes frills.
-        // if(texture != Enemies.RED)      // makes my janky camera/world bounds check work
-            // this.body.setCollideWorldBounds(true); // why should they collide world bounds? force to collide world bounds if you want them spawning inside the map.
+        
         
         scene.add.existing(this);
         this.setScale(0.25);
@@ -34,7 +33,7 @@ export class Enemy extends Phaser.GameObjects.Sprite {
     
     setTarget(target)
 	{
-		this.target = target; // if target alive?
+		this.target = target;
 	}
     
     updateRotation() {
@@ -54,8 +53,7 @@ export class Enemy extends Phaser.GameObjects.Sprite {
     
     
     update(t, dt) {
-        // this.setFlipY((Math.abs(this.rotation) < 1.5708));  // i guess this doesnt work with shaders
-        // this.setFlipY(this.rotation > 1.5708 && this.rotation < 4.71239);  // i guess this doesnt work with shaders
+
 
         switch(this.type) {
             case Enemies.BLUE:
@@ -95,8 +93,8 @@ export class Enemy extends Phaser.GameObjects.Sprite {
                             
                             const x = ((Math.sign(Math.cos(this.rotation)) > 0) ? this.body.width : 0);
                             const y = ((Math.sign(Math.sin(this.rotation)) > 0) ? this.body.height : 0);
-                            // make this not dumb (repeating)
-                            const x1 = ((Math.sign(Math.cos(this.rotation)) < 0) ? this.body.width : 0); // make this better written
+                            
+                            const x1 = ((Math.sign(Math.cos(this.rotation)) < 0) ? this.body.width : 0); 
                             const y1 = ((Math.sign(Math.sin(this.rotation)) < 0) ? this.body.height : 0);
                             
                             if(this.scene.cameras.main.worldView.contains(this.body.x + x1, this.body.y + y1)) {          // contain to camera.

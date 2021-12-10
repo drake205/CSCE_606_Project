@@ -1,7 +1,7 @@
 import { Player } from './Player.js';
 import { Enemy, Enemies } from "./Enemies.js";
 import { TossCoin } from './Math.js';
-import { ItemMan, Item, Items } from './Items.js';
+import { ItemMan, Item } from './Items.js';
 
 
 
@@ -15,7 +15,6 @@ export class EntityMan {
     static prevEnemyCount;
     static timer;
     static score2win = 100000;
-    // static score2win = 150000;
     
     static Init(scene) {
         EntityMan.scene = scene;
@@ -37,7 +36,7 @@ export class EntityMan {
 		EntityMan.SpawnEnemy(Enemies.RED);
         EntityMan.SpawnEnemy(Enemies.BLUE);
         EntityMan.SpawnEnemy(Enemies.BLUE);
-        // dont need to refresh i think.
+        // dont need to refresh
         //-------------------------------------------------------------
         
         scene.physics.add.overlap(EntityMan.enemies, EntityMan.player, Player.DoDamage);
@@ -105,7 +104,7 @@ export class EntityMan {
             EntityMan.scene.events.emit('gamewin');
             // no more spawns allows
             EntityMan.timer = 0;
-            // "you win" swoops in or grows idk.
+            // "you win" swoops in.
         }
         
     }

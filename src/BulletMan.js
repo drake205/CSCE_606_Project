@@ -66,7 +66,7 @@ function doDamage(Bullet, Enemy) {
         case Enemies.GREEN:
             Enemy.scene.sound.play('death1');
             Bullet.destroy();       // might be better to just disable and hide
-            Enemy.destroy();        // maybe just reposition off camera. // kill&hide
+            Enemy.destroy();        // kill&hide
             EntityMan.SpawnEnemy(Enemy.type);
             EntityMan.player.score += 100;
             EntityMan.scene.events.emit('scoreChange', EntityMan.player.score);
@@ -121,7 +121,7 @@ class Bullet extends Phaser.GameObjects.Sprite {
         super(scene, x, y, texture);
         scene.physics.world.enable(this);
         this.body.setCollideWorldBounds(false);
-        // this.body.collideWorldBounds = true;
+        
         scene.add.existing(this);
         this.setDepth(0.2);
     }
@@ -135,7 +135,7 @@ class Bullet extends Phaser.GameObjects.Sprite {
             // this.setVisible(false);
             // this.body.setEnable(false);
             // console.log('worldbounds');
-            this.destroy(); // maybe not destroy. supposed to be expensive.
+            this.destroy(); 
         }
     }
     

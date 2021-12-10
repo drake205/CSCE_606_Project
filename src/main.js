@@ -20,11 +20,11 @@ class Game extends Phaser.Scene {
     music;
 
 
-    constructor(config) {
+    constructor() {
         super({ key: 'game'});
     }
 
-    init(data) {}
+    init() {}
 
     loading_screen() {
         //   https://gamedevacademy.org/creating-a-preloading-screen-in-phaser-3/
@@ -214,7 +214,7 @@ class Game extends Phaser.Scene {
         this.music.play();
 
         this.input.setDefaultCursor('crosshair');
-        this.timer = 0; // i dont think i use this anymore
+        this.timer = 0; 
         this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
             // this.registry.destroy();
             // this.events.off();
@@ -287,7 +287,7 @@ class Game extends Phaser.Scene {
 class GameOver extends Phaser.Scene {
 
     
-    constructor(config) {
+    constructor() {
         super({key: 'gameover'});
     }
 

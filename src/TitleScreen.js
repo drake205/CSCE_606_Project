@@ -12,7 +12,7 @@ export class ImageButton extends Phaser.GameObjects.Image {
             .on('pointerout', () => this.enterButtonRestState() )
             .on('pointerdown', () => this.enterButtonActiveState() )
             .on('pointerup', () => {
-                this.setInteractive({ useHandCursor: false }); // probably does nothing
+                this.setInteractive({ useHandCursor: false }); 
                 this.enterButtonHoverState();
                 callback();
         });
@@ -143,7 +143,7 @@ export class Credits extends Phaser.Scene {
     }
 
 
-    create(data) {
+    create() {
         let w = this.sys.canvas.width;
         let h = this.sys.canvas.height;
 
