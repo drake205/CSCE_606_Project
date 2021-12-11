@@ -72,13 +72,17 @@ export class Enemy extends Phaser.GameObjects.Sprite {
                             this.hp = 1e12;
                             // // wait some time
                             if(this.timer < 834) { 
-                                this.timer += dt;
-                                // this.body.stop(); would be better
+                                if (this.target.alive()){
+                                    this.timer += dt;
+                                }
                                 this.body.acceleration.x = 0;
                                 this.body.acceleration.y = 0;
                                 this.body.velocity.x = 0;
                                 this.body.velocity.y = 0;
-                                this.updateRotation();
+                                const c = this.getCenter();
+                                const ct = this.target.getCenter();
+                                const rotation = Phaser.Math.Angle.Between(c.x,c.y,ct.x,ct.y);
+                                this.setRotation(rotation);
                             } else { 
                                 // reset timer.
                                 this.timer = 0;
