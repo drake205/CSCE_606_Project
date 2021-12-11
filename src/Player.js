@@ -106,7 +106,7 @@ export class Player extends Phaser.GameObjects.Sprite
         this.ammo = 0;
         this.score = 0;
         this.cooldown = 0;
-        this.lives = 5;
+        this.lives = 4;
     }
 
     
