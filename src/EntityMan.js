@@ -65,12 +65,12 @@ export class EntityMan {
             switch(EntityMan.nextEvent) {
                 case 1000:  
                     for(let i = 0; i < 5; ++i)
-		                EntityMan.SpawnEnemy(Enemies.GREEN);
+                        EntityMan.SpawnEnemy(Enemies.GREEN);
                     break;
                 case 2000:
                 case 4000:
                     for(let i = 0; i < 3; ++i)
-		                EntityMan.SpawnEnemy(Enemies.GREEN);
+                        EntityMan.SpawnEnemy(Enemies.GREEN);
                     EntityMan.SpawnEnemy(Enemies.BLUE);
                     break;
                 case 8000:  
@@ -80,7 +80,7 @@ export class EntityMan {
                     break;
                 case 16000:  
                     for(let i = 0; i < 5; ++i) {
-		                EntityMan.SpawnEnemy(Enemies.GREEN);
+                        EntityMan.SpawnEnemy(Enemies.GREEN);
                         EntityMan.SpawnEnemy(Enemies.BLUE);
                         EntityMan.SpawnEnemy(Enemies.RED);
                     }
@@ -93,8 +93,7 @@ export class EntityMan {
                     EntityMan.SpawnEnemy(Enemies.RED);
                     EntityMan.SpawnEnemy(Enemies.RED);
                     break;
-            };
-            
+            }
             EntityMan.nextScoreEvent *= 2;
             EntityMan.prevEnemyCount = EntityMan.enemies.countActive();
         }
@@ -105,6 +104,7 @@ export class EntityMan {
             // no more spawns allows
             EntityMan.timer = 0;
             // "you win" swoops in.
+            // not implemented
         }
         
     }
@@ -125,14 +125,11 @@ export class EntityMan {
                 e = EntityMan.enemies.get(spawnloc.x, spawnloc.y, type);
         	    e.hp = 3;
         	    break;
-        };
+        }
         e.type = type;
         e.setTarget(this.player); // maybe move to create callback
 	    e.setPipeline('Light2D');
     }
-    
-    
-    
 
 
-};
+}

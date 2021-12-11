@@ -1,4 +1,4 @@
-import { GetRandomVec2, TossCoin } from './Math.js'
+import { GetRandomVec2, TossCoin } from './Math.js';
 
 
 export const Enemies = Object.freeze({
@@ -53,8 +53,6 @@ export class Enemy extends Phaser.GameObjects.Sprite {
     
     
     update(t, dt) {
-
-
         switch(this.type) {
             case Enemies.BLUE:
             case Enemies.GREEN:
@@ -72,6 +70,7 @@ export class Enemy extends Phaser.GameObjects.Sprite {
                             this.hp = 1e12;
                             // // wait some time
                             if(this.timer < 834) { 
+                                // wait on camera bound. if playe dead, wait for respawn.
                                 if (this.target.alive()){
                                     this.timer += dt;
                                 }
@@ -79,6 +78,7 @@ export class Enemy extends Phaser.GameObjects.Sprite {
                                 this.body.acceleration.y = 0;
                                 this.body.velocity.x = 0;
                                 this.body.velocity.y = 0;
+                                // always face towards player location even if player dead.
                                 const c = this.getCenter();
                                 const ct = this.target.getCenter();
                                 const rotation = Phaser.Math.Angle.Between(c.x,c.y,ct.x,ct.y);
@@ -145,7 +145,7 @@ export class Enemy extends Phaser.GameObjects.Sprite {
     }
     
     
-};
+}
 
 
 Phaser.GameObjects.GameObjectFactory.register('enemy', function (x, y, texture) {

@@ -2,7 +2,6 @@ import { BulletMan } from "./BulletMan.js";
 import { EntityMan } from "./EntityMan.js";
 import { Enemies } from "./Enemies.js";
 import { ItemMan } from "./Items.js";
-// import { Debug } from "./Debug.js";
 import { UserInterface, TitleScreen, Credits } from "./TitleScreen.js";
 
 const SCALE = 1.6;
@@ -27,7 +26,7 @@ class Game extends Phaser.Scene {
     init() {}
 
     loading_screen() {
-        //   https://gamedevacademy.org/creating-a-preloading-screen-in-phaser-3/
+        // Source:  https://gamedevacademy.org/creating-a-preloading-screen-in-phaser-3/
         var progressBar = this.add.graphics();
         var progressBox = this.add.graphics();
         var width = this.cameras.main.width;
@@ -123,7 +122,6 @@ class Game extends Phaser.Scene {
             key: 'shotgunAmmo',
             url: 'data/gfx/shotgunAmmo.svg'
         });
-        
         this.load.image({
             key: 'slingshot',
             url: 'data/gfx/slingshot.svg'
@@ -136,14 +134,10 @@ class Game extends Phaser.Scene {
             key: 'slingAmmo',
             url: 'data/gfx/slingshotAmmo.svg'
         });
-        
-        
         this.load.image({
             key: 'background',
             url: 'data/gfx/Background.svg',
-            // normalMap: 'data/gfx/BackgroundNormal.svg'
             normalMap: 'data/gfx/NormalThread4.svg'
-            // url: 'data/gfx/backgroundLab.jpg',
         });
         //-----------------------------------
         this.load.audio('game_music', 'data/sfx/music.wav');
@@ -189,7 +183,6 @@ class Game extends Phaser.Scene {
             
         this.lights.enable().setAmbientColor(0x555555);
         var heart_light = this.lights.addLight(1689, 1015, 100, 0xFF3333);
-        // heart_light.setIntensity(2)
         this.hlt = this.tweens.add({
             targets: heart_light,
             radius: 500,
@@ -202,26 +195,22 @@ class Game extends Phaser.Scene {
         this.events.on('nextEvent', function (value) {  // make nextEvent happen with time instead.
                 this.hlt.timeScale *= 1.5;
                 this.music.rate += 0.07;
-                // use another tween to raise the music slowly
         }, this);
         
         EntityMan.Init(this);
         ItemMan.Init(this);
         BulletMan.Init(this);
-        // Debug.Init(this);
         
         this.music = this.sound.add('game_music', {loop: true, volume: 0.2, rate: 0.5});
         this.music.play();
 
         this.input.setDefaultCursor('crosshair');
-        this.timer = 0; 
         this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
-            // this.registry.destroy();
-            // this.events.off();
             this.time.delayedCall(1000, () => {
     			this.scene.start('gameover', { fadeIn: true, score: EntityMan.player.score, win: false });
     		}, this);
         }, this);
+        
         this.events.once('gamewin', ()=>{
              // kill all enemies.
             EntityMan.enemies.children.each(child => {
@@ -237,12 +226,11 @@ class Game extends Phaser.Scene {
                 child.destroy();
             });
             // explode them w/confetti.
+            // not implemented
             // hide ui
             this.events.emit('livesChange', 0);
             // launch gameover
-            
             const time_ms = 2000;
-            // let gm = EntityMan.scene.sound.get('game_music');
             this.tweens.add({
                 targets:  this.music,
                 volume:   0,
@@ -253,20 +241,9 @@ class Game extends Phaser.Scene {
                 }
             });
         }, this);
-        
-        
-
-        // if(this.scene.isSleeping('ui')) {
-        //     this.scene.wake('ui'); 
-        //     this.scene.bringToTop('ui');
-        // } else {
-            this.scene.launch('ui');
-        // }
-        
+        this.scene.launch('ui');
     }
 
-
-  
 
     update(time, delta) {
         this.cameras.main.startFollow(EntityMan.player);
@@ -276,8 +253,6 @@ class Game extends Phaser.Scene {
         pointer.worldY = wp.y;
         EntityMan.Update(time, delta);
         BulletMan.Update(time, delta);
-        // Debug.update(time, delta);
-        
     }
 }
 
@@ -308,21 +283,16 @@ class GameOver extends Phaser.Scene {
         this.scoreTxt = this.add.text(w/2, h/3, 'Final Score: ' + data.score, { fill: '#0f0' }).setFontSize(60).setOrigin(0.5, 0.5);
         this.mm = this.add.ImgButton(w/2, h/1.8, 'mainmenubtn', () => this.mainMenu(data.win)).setOrigin(0.5, 0.5);
         this.rs = this.add.ImgButton(w/2, h/1.5, 'playagainbtn', () => this.playAgain(data.win)).setOrigin(0.5, 0.5);
-        // the music and logo are pretty lame
         if(data.win) {
             this.music = this.sound.add('fanfare', {loop: true });
             this.music.play();
         } else {
-            // this.music = this.sound.add('fanfare', {loop: true });
-            // this.music.play();
-            // this.events.on('transitioncomplete', function(fromScene) { 
-                // this.scene.remove('game');
-            // });
+            // No music when you lose.
         }
     }
     
+    
     playAgain(win) {
-        
         if(win)
             this.music.stop();
         // gotta do this. else states are left-over from different systems. if you managed different systems music, lights globally maybe it would fix.
@@ -334,6 +304,7 @@ class GameOver extends Phaser.Scene {
     	this.scene.start('game', { fadeIn: true });
     }
     
+    
     mainMenu(win) {
         if(win)
             this.music.stop();
@@ -343,12 +314,6 @@ class GameOver extends Phaser.Scene {
         this.scene.add('ui', UserInterface, false);
         this.scene.start('default', { fadeIn: true });
     }
-    
-    
-    
-    
-    
-     
 }
 
 
@@ -356,28 +321,10 @@ class GameOver extends Phaser.Scene {
 
 
 
-
-
-// create a webgl1 & then a webgl1 and webgl experimental fallback
 const myCustomCanvas = document.createElement('canvas');
 document.body.appendChild(myCustomCanvas);
-const contextCreationConfig = {
-    alpha: true,
-    depth: false,
-    // antialias: true,
-    // premultipliedAlpha: true,
-    // stencil: true,
-    preserveDrawingBuffer: false,
-    failIfMajorPerformanceCaveat: false,
-    powerPreference: 'default'
-};
-
-// const myCustomContext = myCustomCanvas.getContext('webgl2', contextCreationConfig);
-// const myCustomContext = myCustomCanvas.getContext('webgl', contextCreationConfig);
 const myCustomContext = myCustomCanvas.getContext('webgl');
 myCustomContext.getExtension('OES_standard_derivatives');
-
-// type: Phaser.AUTO,
 const gameConfig = {
     type: Phaser.WEBGL,
     canvas: myCustomCanvas,
@@ -385,23 +332,14 @@ const gameConfig = {
     maxLights: 11,
     width: clientWidth,
     height: clientHeight,
-    //  parent: divId,
-    // antialias: false,
-    // premultipliedAlpha: false,
-    // mipmapFilter: 'LINEAR_MIPMAP_LINEAR',
     roundPixels: true,
-    // mode: Phaser.Scale.SHOW_ALL,
     mode: Phaser.Scale.FIT,
-    "callbacks.postBoot": function() {
-        // document.getElementsByTagName("canvas")[0].style.width = clientWidth + "px";
-        // document.getElementsByTagName("canvas")[0].style.height = clientHeight + "px";
-    },
     physics: {
         default: 'arcade',
         arcade: {
             gravity: { y: 0 },
             debug: true,            // lights only work in debug mode?
-            debugShowBody: false,   // yo Keep this off. I moved velocity to body also. Velocity now draws 1 pixel that somehow fixes broken lights
+            debugShowBody: false,   // Keep this off. I moved velocity debug to body also. Velocity now draws 1 pixel that somehow fixes broken lights
             debugShowVelocity: true // and keep this ON.
         }
     },
@@ -410,3 +348,27 @@ const gameConfig = {
  };
 var game = new Phaser.Game(gameConfig);
 
+function isMobile() {
+  try{ document.createEvent("TouchEvent"); return true; }
+  catch(e){ return false; }
+}
+window.addEventListener("resize", resize, false);
+function resize() {
+    // https://stackoverflow.com/questions/49716741/how-do-i-scale-the-scene-to-fullscreen
+    var canvas = document.querySelector("canvas");
+    var windowWidth = window.innerWidth;
+    var windowHeight = window.innerHeight;
+    var windowRatio = windowWidth / windowHeight;
+    var gameRatio = game.config.width / game.config.height;
+    if (windowRatio < gameRatio) {
+        canvas.style.width = windowWidth + "px";
+        canvas.style.height = (windowWidth / gameRatio) + "px";
+    } else {
+        canvas.style.width = (windowHeight * gameRatio) + "px";
+        canvas.style.height = windowHeight + "px";
+    }
+}
+
+window.addEventListener("orientationchange", function() {
+    alert("Refresh Page!");
+}, false);

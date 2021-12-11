@@ -1,5 +1,5 @@
 import { EntityMan } from "./EntityMan.js";
-import { Enemy, Enemies } from "./Enemies.js";
+import { Enemies } from "./Enemies.js";
 
 
 export const Bullets = {
@@ -13,7 +13,7 @@ export class BulletMan {
     static bullets;  
     static scene;
       
-    static Init(scene) { ;
+    static Init(scene) {
         BulletMan.bullets = scene.add.group({
             classType: Bullet,
             runChildUpdate: true
@@ -41,7 +41,7 @@ export class BulletMan {
         }
     }
       
-};
+}
 
 
 export function score_fade(x, y, score) {
@@ -107,7 +107,7 @@ function doDamage(Bullet, Enemy) {
             }
             break;
             
-    };
+    }
 }
 
 
@@ -132,12 +132,9 @@ class Bullet extends Phaser.GameObjects.Sprite {
         this.body.velocity.x = this.dir.x * speed;
         this.body.velocity.y = this.dir.y * speed;
         if(this.body.checkWorldBounds()) {
-            // this.setVisible(false);
-            // this.body.setEnable(false);
-            // console.log('worldbounds');
             this.destroy(); 
         }
     }
     
     
-};
+}

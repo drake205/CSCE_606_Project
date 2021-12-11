@@ -2,6 +2,9 @@ examples/*
 _other/*
 ; data/*
 .c9/*
+.DS_Store
+src/.DS_Store
+src/data/.DS_Store
 emrun.py
 makefile
 documentation

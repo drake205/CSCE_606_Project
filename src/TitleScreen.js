@@ -4,9 +4,6 @@ export class ImageButton extends Phaser.GameObjects.Image {
     constructor(scene, x, y, texture, callback) {
         super(scene, x, y, texture);
         
-        // this.setTexture('PlayButton');
-        // this.setPosition(x, y);
-        
         this.setInteractive({ useHandCursor: true })
             .on('pointerover', () => this.enterButtonHoverState() )
             .on('pointerout', () => this.enterButtonRestState() )
@@ -91,7 +88,7 @@ export class UserInterface extends Phaser.Scene {
         
     }
 
-};
+}
 
 export class TitleScreen extends Phaser.Scene {
 

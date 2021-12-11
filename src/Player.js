@@ -1,13 +1,10 @@
 import { BulletMan, Bullets, score_fade } from './BulletMan.js';
-import { Item, Items, ItemSound } from './Items.js';
-import { normalize } from './Math.js';
-
+import { Items, ItemSound } from './Items.js';
 
 
 export class Player extends Phaser.GameObjects.Sprite
 {
     
-      
     a1; a2;
     weapon; ammo
     shoot;
@@ -49,16 +46,12 @@ export class Player extends Phaser.GameObjects.Sprite
         this.body.setCircle(r);
         //--------------------------------------------------
         if(!scene.sys.game.device.os.desktop) {
-            scene.input.addPointer(1);
+            scene.input.addPointer(2);
             this.j1 = scene.plugins.get('rexvirtualjoystickplugin').add(scene, {
                     x: 150, y: scene.cameras.main.displayHeight-150,
                     radius: 100,
             });
-            this.cursorKeys = this.j1.createCursorKeys()
-            this.j2 = scene.plugins.get('rexvirtualjoystickplugin').add(scene, {
-                    x: scene.cameras.main.displayWidth-150, y: scene.cameras.main.displayHeight-150,
-                    radius: 100,
-            });
+            this.cursorKeys = this.j1.createCursorKeys();
             this.pressedKeys = [];
         }
         //--------------------------------------------------
@@ -97,8 +90,6 @@ export class Player extends Phaser.GameObjects.Sprite
         
         this.weapon = scene.add.item(x, y, Items.SLINGSHOT);
         this.light = this.scene.lights.addLight(0, 0, 150);
-        // this.light.setIntensity(1.5);
-        // this.light.radius = 100;
         this.angle = 0;
         this.radius = r;
         this.body.setMaxVelocity(200, 200);
@@ -124,8 +115,11 @@ export class Player extends Phaser.GameObjects.Sprite
                 this.scene.input.mousePointer.worldX, this.scene.input.mousePointer.worldY
             );
         } else {
-            if(this.j2.forceX != 0 || this.j2.forceY != 0)
-                this.angle = this.j2.rotation;
+            let pointer = (this.j1.pointerX == this.scene.input.pointer1.worldX) ? this.scene.input.pointer2 : this.scene.input.pointer1;
+            this.angle = Phaser.Math.Angle.Between(
+                pc.x, pc.y, 
+                pointer.worldX, pointer.worldY
+            );
         }
         const is_dir = (Math.abs(this.angle) < 1.5708);    // Am i facing left or right?
         
@@ -242,7 +236,7 @@ export class Player extends Phaser.GameObjects.Sprite
                 this.body.velocity.x = 0; break;
             case 83: case 40: // down    
                 this.body.velocity.y = 0; break;
-        };
+        }
     }
     
     
@@ -277,14 +271,11 @@ export class Player extends Phaser.GameObjects.Sprite
         // disable movement.
         player.body.moves = false;
         // disable input. keyboard & mouse event
-        // player.scene.input.keyboard.enabled = false;
         player.scene.input.off('pointerdown', player.pointerdown, player);
         // subtract lives
         --player.lives;
         // turn off light
         player.light.setIntensity(0.01); // dont turn off completely. bug in phaser makes screen go black.
-        // player.light.setIntensity(3);
-        // console.log(player.light.intensity);
         // update UI
         BulletMan.scene.events.emit('livesChange', player.lives);
         // check if gameover
@@ -312,7 +303,6 @@ export class Player extends Phaser.GameObjects.Sprite
                 onComplete: function () {
                     // enable movement.   some of this is redundant same with above
                     player.body.moves = true;
-                    // player.scene.input.keyboard.enabled = true;
                     player.light.setIntensity(1);
                     player.scene.input.on('pointerdown', player.mousedown, player);
                     // player.body.stop(); // clear any leftover velocity
@@ -321,12 +311,11 @@ export class Player extends Phaser.GameObjects.Sprite
         }
     }
     
-    
+
     alive() { return this.alpha == 1; }
-    
-    
-    
-};
+
+
+}
 
 
 Phaser.GameObjects.GameObjectFactory.register('player', function (x, y, r) {

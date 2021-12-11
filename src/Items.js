@@ -15,7 +15,7 @@ export const ItemSound = {
     CHAIN  : 'shoot_pop',
     SHOTGUN  : 'shoot_bang',
     SLINGSHOT: 'shoot_twang'
-}
+};
 
 
 
@@ -25,7 +25,7 @@ export class ItemMan {
     static scene;
     
     static Init(scene) { 
-        ItemMan.scene = scene;;
+        ItemMan.scene = scene;
         ItemMan.items = scene.add.group({
             classType: Item,
             maxSize: 4,
@@ -50,7 +50,7 @@ export class ItemMan {
 
     }
       
-};
+}
 
 
 function getItem(Item, Player) {
@@ -113,7 +113,7 @@ export class Item extends Phaser.GameObjects.Sprite {
                 scene.physics.world.enable(this);
                 break;
                 
-        };
+        }
         scene.add.existing(this);
         this.setDepth(0.2);
     }
@@ -126,7 +126,7 @@ export class Item extends Phaser.GameObjects.Sprite {
     }
     
     
-};
+}
 
 
 Phaser.GameObjects.GameObjectFactory.register('item', function (x, y, texture) {
