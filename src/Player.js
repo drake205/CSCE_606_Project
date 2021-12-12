@@ -253,6 +253,8 @@ export class Player extends Phaser.GameObjects.Sprite
             this.weapon.destroy();
             this.weapon = this.scene.add.item(this.x, this.y, weaponType);
             this.ammo = ammo;
+            // if not alive, and picked up weapon somehow, match the alpha of respawn.
+            if(!this.alive()) this.weapon.alpha = this.alpha;
         }
         this.scene.events.emit('ammoChange', this.ammo);
     }
