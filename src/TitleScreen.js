@@ -61,7 +61,7 @@ export class UserInterface extends Phaser.Scene {
     {
         this.scoreText = this.add.text(10, 50, 'Score: 0' , {fontFamily: 'Courier New', fontSize: 20, fill: '#0f0' });
         this.gameText = this.add.text(10, 20, 'Game Progress: 0%', {fontFamily: 'Courier New', fontSize: 20, fill: '#0f0' });
-        this.ammoText = this.add.text(10, 80, 'Ammo: ∞', {fontFamily: 'Courier New', fontSize: 20, fill: '#0f0' });
+        this.ammoText = this.add.text(10, 80, 'Ammo: Unlimited', {fontFamily: 'Courier New', fontSize: 20, fill: '#0f0' });
         this.livesText = this.add.text(10, 110, 'Lives: 4', {fontFamily: 'Courier New', fontSize: 20, fill: '#0f0' });
         
         // on destruction this
@@ -73,7 +73,7 @@ export class UserInterface extends Phaser.Scene {
         }, this);
         
         ourGame.events.on('ammoChange', function (value) {
-            if(value <= 0) value = '∞';
+            if(value <= 0) value = 'Unlimited';
             this.ammoText.setText('Ammo: ' + value);
         }, this);
         
