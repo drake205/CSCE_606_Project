@@ -268,6 +268,8 @@ export class Player extends Phaser.GameObjects.Sprite
         player.a2.alpha = 0;
         player.a2.alpha = 0;
         player.weapon.alpha = 0;
+        // Turn off machine gun if shooting
+        player.shoot = false;
         // disable movement.
         player.body.moves = false;
         // disable input. keyboard & mouse event

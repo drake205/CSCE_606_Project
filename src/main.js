@@ -236,7 +236,7 @@ class Game extends Phaser.Scene {
                 volume:   0,
                 duration: time_ms,
                 onComplete: ()=>{
-                    this.scene.launch('gameover', { fadeIn: true, score: EntityMan.player.score, win: true });
+                    this.scene.launch('gameover', { fadeIn: true, score: EntityMan.player.score, lives: EntityMan.player.lives, win: true });
                     this.scene.bringToTop('gameover');
                 }
             });
@@ -280,13 +280,14 @@ class GameOver extends Phaser.Scene {
         let h = this.sys.canvas.height;
         let logo_id = (data.win) ?  'victory' : 'gameoverTxt'; 
         this.logo = this.add.image(w/2, h/6, logo_id).setOrigin(0.5, 0.5).setScale(0.8);
-        this.scoreTxt = this.add.text(w/2, h/3, 'Final Score: ' + data.score, { fill: '#0f0' }).setFontSize(60).setOrigin(0.5, 0.5);
         this.mm = this.add.ImgButton(w/2, h/1.8, 'mainmenubtn', () => this.mainMenu(data.win)).setOrigin(0.5, 0.5);
         this.rs = this.add.ImgButton(w/2, h/1.5, 'playagainbtn', () => this.playAgain(data.win)).setOrigin(0.5, 0.5);
         if(data.win) {
+            this.scoreTxt = this.add.text(w/2, h/3, 'Final Score: ' + data.score + " x " + data.lives + " lives" + " = " + data.score*data.lives, { fill: '#0f0' }).setFontSize(60).setOrigin(0.5, 0.5);
             this.music = this.sound.add('fanfare', {loop: true });
             this.music.play();
         } else {
+            this.scoreTxt = this.add.text(w/2, h/3, 'Final Score: ' + data.score, { fill: '#0f0' }).setFontSize(60).setOrigin(0.5, 0.5);
             // No music when you lose.
         }
     }
